@@ -37,6 +37,6 @@ public class StandardLane implements Lane {
 
     @Override
     public TurnDirection nextCarTurnDirection() {
-        return queue.peek().getTurnDirection();
+        return queue.isEmpty() ? null : queue.peek().getTurnDirection();
     }
 }

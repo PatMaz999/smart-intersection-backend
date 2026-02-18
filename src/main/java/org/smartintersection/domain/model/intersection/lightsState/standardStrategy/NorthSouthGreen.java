@@ -3,10 +3,21 @@ package org.smartintersection.domain.model.intersection.lightsState.standardStra
 import org.smartintersection.domain.model.intersection.Direction;
 import org.smartintersection.domain.model.intersection.Lane;
 import org.smartintersection.domain.model.intersection.lightsState.AbstractLightsState;
+import org.smartintersection.domain.model.intersection.lightsState.LightColor;
 import org.smartintersection.domain.model.intersection.lightsState.LightsState;
 import org.smartintersection.domain.model.vehicle.TurnDirection;
 
-public class NorthSouth extends AbstractLightsState {
+
+public class NorthSouthGreen extends AbstractLightsState {
+
+    public NorthSouthGreen() {
+        super(LightColor.GREEN,
+                LightColor.GREEN,
+                LightColor.RED_WITH_GREEN_ARROW,
+                LightColor.RED_WITH_GREEN_ARROW
+        );
+    }
+
     @Override
     public boolean canMove(Lane lane) {
 
@@ -45,6 +56,6 @@ public class NorthSouth extends AbstractLightsState {
 
     @Override
     public LightsState nextState() {
-        return null;
+        return new NorthSouthYellow();
     }
 }

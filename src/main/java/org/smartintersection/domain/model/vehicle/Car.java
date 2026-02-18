@@ -5,5 +5,5 @@ import lombok.Getter;
 @Getter
 public class Car implements Vehicle {
     private VehicleId id;
-    private Direction direction;
+    private TurnDirection turnDirection;
 }

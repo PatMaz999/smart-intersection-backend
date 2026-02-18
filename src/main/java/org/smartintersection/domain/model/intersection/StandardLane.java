@@ -1,11 +1,19 @@
 package org.smartintersection.domain.model.intersection;
 
+import org.smartintersection.domain.model.vehicle.TurnDirection;
 import org.smartintersection.domain.model.vehicle.Vehicle;
 
+import java.util.LinkedList;
 import java.util.Queue;
 
 public class StandardLane implements Lane {
-    Queue<Vehicle> queue;
+    private Queue<Vehicle> queue;
+    private final Direction direction;
+
+    public StandardLane(Direction direction) {
+        this.queue = new LinkedList<>();
+        this.direction = direction;
+    }
 
     @Override
     public void addVehicle(Vehicle vehicle) {
@@ -23,7 +31,12 @@ public class StandardLane implements Lane {
     }
 
     @Override
-    public void getLinePriority() {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public Direction getDirection() {
+        return direction;
+    }
+
+    @Override
+    public TurnDirection nextCarTurnDirection() {
+        return queue.peek().getTurnDirection();
     }
 }

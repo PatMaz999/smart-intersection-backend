@@ -3,6 +3,8 @@ package org.smartintersection.domain.model.intersection;
 import org.smartintersection.domain.model.vehicle.TurnDirection;
 import org.smartintersection.domain.model.vehicle.Vehicle;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
 
@@ -36,7 +38,23 @@ public class StandardLane implements Lane {
     }
 
     @Override
+    public int getPriority() {
+        return queue.isEmpty() ? 0 : queue.peek().getPriority();
+    }
+
+    @Override
+    public void incrementPriority() {
+        for(Vehicle vehicle : queue)
+            vehicle.incrementPriority();
+    }
+
+    @Override
     public TurnDirection nextCarTurnDirection() {
         return queue.isEmpty() ? null : queue.peek().getTurnDirection();
+    }
+
+    @Override
+    public Collection<Vehicle> getQueue(){
+        return Collections.unmodifiableCollection(queue);
     }
 }

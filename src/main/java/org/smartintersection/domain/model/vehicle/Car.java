@@ -6,4 +6,10 @@ import lombok.Getter;
 public class Car implements Vehicle {
     private VehicleId id;
     private TurnDirection turnDirection;
+    private int priority;
+
+    @Override
+    public void incrementPriority() {
+        priority++;
+    }
 }

@@ -39,4 +39,24 @@ public abstract class AbstractLightsState implements LightsState {
                 Direction.WEST, getWestLane()
         );
     }
+
+    @Override
+    public LightColor getNorthColor() {
+        return northLane;
+    }
+
+    @Override
+    public LightColor getSouthColor() {
+        return southLane;
+    }
+
+    @Override
+    public LightColor getEastColor() {
+        return eastLane;
+    }
+
+    @Override
+    public LightColor getWestColor() {
+        return westLane;
+    }
 }

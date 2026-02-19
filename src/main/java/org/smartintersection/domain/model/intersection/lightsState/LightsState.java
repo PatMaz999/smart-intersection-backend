@@ -10,4 +10,8 @@ public interface LightsState {
     LightsState nextState();
     boolean isClearancePhase();
     Map<Direction, LightColor> getLightColors();
+    LightColor getNorthColor();
+    LightColor getSouthColor();
+    LightColor getEastColor();
+    LightColor getWestColor();
 }

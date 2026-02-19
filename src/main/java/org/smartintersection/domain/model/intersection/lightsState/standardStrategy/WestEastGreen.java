@@ -2,6 +2,7 @@ package org.smartintersection.domain.model.intersection.lightsState.standardStra
 
 import org.smartintersection.domain.model.intersection.Direction;
 import org.smartintersection.domain.model.intersection.Lane;
+import org.smartintersection.domain.model.intersection.LanesConfiguration;
 import org.smartintersection.domain.model.intersection.lightsState.AbstractLightsState;
 import org.smartintersection.domain.model.intersection.lightsState.LightColor;
 import org.smartintersection.domain.model.intersection.lightsState.LightsState;
@@ -18,19 +19,20 @@ public class WestEastGreen extends AbstractLightsState {
     }
 
     @Override
-    public boolean canMove(Lane lane) {
+    public boolean canMove(LanesConfiguration lanes, Direction laneDirection) {
 
-        if (lane.getCarsCount() == 0) {
+        Lane currentLane = lanes.getLaneByDirection(laneDirection);
+
+        if (currentLane.getCarsCount() == 0) {
             return false;
         }
 
-        Direction laneDirection = lane.getDirection();
-        TurnDirection carDirection = lane.nextCarTurnDirection();
+        TurnDirection carDirection = currentLane.nextCarTurnDirection();
 
         if (laneDirection == Direction.WEST || laneDirection == Direction.EAST) {
             if (carDirection == TurnDirection.LEFT) {
                 Lane oppositeLane = (laneDirection == Direction.WEST) ?
-                        getIntersection().getEastLane() : getIntersection().getWestLane();
+                        lanes.getEastLane() : lanes.getWestLane();
                 if (oppositeLane.getCarsCount() == 0)
                     return true;
                 TurnDirection oppositeTurn = oppositeLane.nextCarTurnDirection();
@@ -41,12 +43,12 @@ public class WestEastGreen extends AbstractLightsState {
         }
 
         if (laneDirection == Direction.NORTH && carDirection == TurnDirection.RIGHT) {
-            TurnDirection eastTurn = getIntersection().getEastLane().nextCarTurnDirection();
+            TurnDirection eastTurn = lanes.getEastLane().nextCarTurnDirection();
             return eastTurn != TurnDirection.STRAIGHT;
         }
 
         if (laneDirection == Direction.SOUTH && carDirection == TurnDirection.RIGHT) {
-            TurnDirection westTurn = getIntersection().getWestLane().nextCarTurnDirection();
+            TurnDirection westTurn = lanes.getWestLane().nextCarTurnDirection();
             return westTurn != TurnDirection.STRAIGHT;
         }
 

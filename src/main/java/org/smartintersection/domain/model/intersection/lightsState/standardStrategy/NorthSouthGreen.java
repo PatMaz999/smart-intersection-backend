@@ -2,6 +2,7 @@ package org.smartintersection.domain.model.intersection.lightsState.standardStra
 
 import org.smartintersection.domain.model.intersection.Direction;
 import org.smartintersection.domain.model.intersection.Lane;
+import org.smartintersection.domain.model.intersection.LanesConfiguration;
 import org.smartintersection.domain.model.intersection.lightsState.AbstractLightsState;
 import org.smartintersection.domain.model.intersection.lightsState.LightColor;
 import org.smartintersection.domain.model.intersection.lightsState.LightsState;
@@ -19,19 +20,20 @@ public class NorthSouthGreen extends AbstractLightsState {
     }
 
     @Override
-    public boolean canMove(Lane lane) {
+    public boolean canMove(LanesConfiguration lanes, Direction laneDirection) {
 
-        if (lane.getCarsCount() == 0) {
+        Lane currentLane = lanes.getLaneByDirection(laneDirection);
+
+        if (currentLane.getCarsCount() == 0) {
             return false;
         }
 
-        Direction laneDirection = lane.getDirection();
-        TurnDirection carDirection = lane.nextCarTurnDirection();
+        TurnDirection carDirection = currentLane.nextCarTurnDirection();
 
         if (laneDirection == Direction.NORTH || laneDirection == Direction.SOUTH) {
             if (carDirection == TurnDirection.LEFT) {
                 Lane oppositeLane = (laneDirection == Direction.NORTH) ?
-                        getIntersection().getSouthLane() : getIntersection().getNorthLane();
+                        lanes.getSouthLane() : lanes.getNorthLane();
                 if (oppositeLane.getCarsCount() == 0)
                     return true;
                 TurnDirection oppositeTurn = oppositeLane.nextCarTurnDirection();
@@ -42,12 +44,12 @@ public class NorthSouthGreen extends AbstractLightsState {
         }
 
         if (laneDirection == Direction.WEST && carDirection == TurnDirection.RIGHT) {
-            TurnDirection northTurn = getIntersection().getNorthLane().nextCarTurnDirection();
+            TurnDirection northTurn = lanes.getNorthLane().nextCarTurnDirection();
             return northTurn != TurnDirection.STRAIGHT;
         }
 
         if (laneDirection == Direction.EAST && carDirection == TurnDirection.RIGHT) {
-            TurnDirection southTurn = getIntersection().getSouthLane().nextCarTurnDirection();
+            TurnDirection southTurn = lanes.getSouthLane().nextCarTurnDirection();
             return southTurn != TurnDirection.STRAIGHT;
         }
 

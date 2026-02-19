@@ -4,6 +4,6 @@ import lombok.Getter;
 
 public abstract class AbstractTrafficStrategy implements TrafficStrategy {
     @Getter
-    private Intersection intersection;
+    private LanesConfiguration lanes;
 
 }

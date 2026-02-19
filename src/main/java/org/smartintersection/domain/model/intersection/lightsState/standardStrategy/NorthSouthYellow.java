@@ -2,6 +2,7 @@ package org.smartintersection.domain.model.intersection.lightsState.standardStra
 
 import org.smartintersection.domain.model.intersection.Direction;
 import org.smartintersection.domain.model.intersection.Lane;
+import org.smartintersection.domain.model.intersection.LanesConfiguration;
 import org.smartintersection.domain.model.intersection.lightsState.AbstractLightsState;
 import org.smartintersection.domain.model.intersection.lightsState.LightColor;
 import org.smartintersection.domain.model.intersection.lightsState.LightsState;
@@ -22,12 +23,15 @@ public class NorthSouthYellow extends AbstractLightsState {
     }
 
     @Override
-    public boolean canMove(Lane lane) {
-        if (lane.getCarsCount() == 0) {
+    public boolean canMove(LanesConfiguration lanes, Direction laneDirection) {
+
+        Lane currentLane = lanes.getLaneByDirection(laneDirection);
+
+        if (currentLane.getCarsCount() == 0) {
             return false;
         }
-        Direction laneDirection = lane.getDirection();
-        TurnDirection carDirection = lane.nextCarTurnDirection();
+
+        TurnDirection carDirection = currentLane.nextCarTurnDirection();
         return (laneDirection == Direction.NORTH || laneDirection == Direction.SOUTH)
                 && carDirection == TurnDirection.LEFT;
     }

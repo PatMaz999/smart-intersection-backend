@@ -26,27 +26,27 @@ public class StandardStrategy extends AbstractTrafficStrategy {
 
     @Override
     public LightsState getInitialState() {
-        int verticalCarSum = getIntersection().getNorthLane().getCarsCount() +
-                getIntersection().getSouthLane().getCarsCount();
-        int horizontalCarSum = getIntersection().getWestLane().getCarsCount() +
-                getIntersection().getEastLane().getCarsCount();
+        int verticalCarSum = getLanes().getNorthLane().getCarsCount() +
+                getLanes().getSouthLane().getCarsCount();
+        int horizontalCarSum = getLanes().getWestLane().getCarsCount() +
+                getLanes().getEastLane().getCarsCount();
         return verticalCarSum >= horizontalCarSum ? new NorthSouthGreen() : new WestEastGreen();
     }
 
     @Override
     public boolean shouldChangeState() {
-        LightsState currentState = getIntersection().getLightsState();
-        if(getIntersection().getMaxPriority() < 12){
+//        LightsState currentState = getLanes().getLightsState();
+        if(getLanes().getMaxPriority() < 12){
             throw new UnsupportedOperationException("Not supported yet.");
         }
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private LightsState findBestByThroughput(LightsState lights, int ticks){
-        var northLane = getIntersection().getNorthLane();
-        var southLane = getIntersection().getSouthLane();
-        var westLane = getIntersection().getWestLane();
-        var eastLane = getIntersection().getEastLane();
+        var northLane = getLanes().getNorthLane();
+        var southLane = getLanes().getSouthLane();
+        var westLane = getLanes().getWestLane();
+        var eastLane = getLanes().getEastLane();
 
         for(int i=0; i < ticks; i++){
             if(northLane.hasNext()){

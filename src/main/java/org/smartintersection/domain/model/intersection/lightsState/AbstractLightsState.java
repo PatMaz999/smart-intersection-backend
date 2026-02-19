@@ -2,7 +2,6 @@ package org.smartintersection.domain.model.intersection.lightsState;
 
 import lombok.Getter;
 import org.smartintersection.domain.model.intersection.Direction;
-import org.smartintersection.domain.model.intersection.Intersection;
 
 import java.util.Map;
 
@@ -12,8 +11,6 @@ public abstract class AbstractLightsState implements LightsState {
     private final LightColor southLane;
     private final LightColor westLane;
     private final LightColor eastLane;
-
-    private Intersection intersection;
 
     public AbstractLightsState(LightColor northLane, LightColor southLane, LightColor westLane, LightColor eastLane) {
         this.northLane = northLane;

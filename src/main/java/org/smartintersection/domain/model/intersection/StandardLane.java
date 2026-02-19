@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.stream.Collectors;
 
-public class StandardLane implements Lane, LanePrototype {
+public class StandardLane implements Lane {
     private Queue<Vehicle> queue;
     private final Direction direction;
 
@@ -22,6 +22,11 @@ public class StandardLane implements Lane, LanePrototype {
         this.queue = queue.stream()
                 .limit(queueSize)
                 .collect(Collectors.toCollection(LinkedList::new));
+        this.direction = direction;
+    }
+
+    private StandardLane(Queue<Vehicle> queue, Direction direction) {
+        this.queue = new LinkedList<>(queue);
         this.direction = direction;
     }
 
@@ -69,5 +74,10 @@ public class StandardLane implements Lane, LanePrototype {
     @Override
     public Lane clone(int size){
         return new StandardLane(queue, size, direction);
+    }
+
+    @Override
+    public Lane clone() {
+        return new StandardLane(queue, direction);
     }
 }

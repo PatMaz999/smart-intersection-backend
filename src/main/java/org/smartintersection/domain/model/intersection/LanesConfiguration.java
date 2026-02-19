@@ -18,6 +18,13 @@ public class LanesConfiguration {
         this.eastLane = eastLane.clone(size);
     }
 
+    private LanesConfiguration(Lane northLane, Lane southLane, Lane westLane, Lane eastLane) {
+        this.northLane = northLane.clone();
+        this.southLane = southLane.clone();
+        this.westLane = westLane.clone();
+        this.eastLane = eastLane.clone();
+    }
+
     public int getMaxPriority(){
         return IntStream.of(
                 northLane.getPriority(),
@@ -38,5 +45,9 @@ public class LanesConfiguration {
 
     public LanesConfiguration clone(int size){
         return new LanesConfiguration(northLane, southLane, westLane, eastLane, size);
+    }
+
+    public LanesConfiguration clone(){
+        return new LanesConfiguration(northLane, southLane, westLane, eastLane);
     }
 }

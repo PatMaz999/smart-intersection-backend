@@ -5,6 +5,7 @@ import org.smartintersection.domain.model.vehicle.Vehicle;
 
 import java.util.Collection;
 
+//TODO: refactor
 public interface Lane {
     void addVehicle(Vehicle vehicle);
     Vehicle passNextVehicle();
@@ -15,4 +16,5 @@ public interface Lane {
     TurnDirection nextCarTurnDirection();
     Collection<Vehicle> getQueue();
     Lane clone(int size);
+    Lane clone();
 }

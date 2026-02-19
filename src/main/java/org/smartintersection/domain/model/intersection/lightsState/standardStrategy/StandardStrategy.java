@@ -2,17 +2,18 @@ package org.smartintersection.domain.model.intersection.lightsState.standardStra
 
 import org.smartintersection.domain.model.intersection.AbstractTrafficStrategy;
 import org.smartintersection.domain.model.intersection.Direction;
-import org.smartintersection.domain.model.intersection.Lane;
-import org.smartintersection.domain.model.intersection.TrafficStrategy;
+import org.smartintersection.domain.model.intersection.LanesConfiguration;
 import org.smartintersection.domain.model.intersection.lightsState.LightsState;
-import org.smartintersection.domain.model.vehicle.Vehicle;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 public class StandardStrategy extends AbstractTrafficStrategy {
 
+//    private static final int REQUIRED_PRIORITY = 6;
+
     private List<LightsState> allowedLightsStates;
+    private int maxWaitingTime;
 
     public StandardStrategy(List<LightsState> lightsStates) {
         this.allowedLightsStates = lightsStates;
@@ -34,28 +35,74 @@ public class StandardStrategy extends AbstractTrafficStrategy {
     }
 
     @Override
-    public boolean shouldChangeState() {
-//        LightsState currentState = getLanes().getLightsState();
-        if(getLanes().getMaxPriority() < 12){
-            throw new UnsupportedOperationException("Not supported yet.");
+    public LightsState findBestState(LightsState currentState) {
+        int timeToMaxWaitingTime = maxWaitingTime - getLanes().getMaxPriority();
+        LanesConfiguration currentLanesCopy = getLanes().clone(timeToMaxWaitingTime);
+
+        if(timeToMaxWaitingTime > 0){
+            return findByThroughput(currentLanesCopy, timeToMaxWaitingTime, currentState);
         }
-        throw new UnsupportedOperationException("Not supported yet.");
+        else{
+            return findByPriority(currentLanesCopy);
+        }
     }
 
-    private LightsState findBestByThroughput(LightsState lights, int ticks){
-        var northLane = getLanes().getNorthLane();
-        var southLane = getLanes().getSouthLane();
-        var westLane = getLanes().getWestLane();
-        var eastLane = getLanes().getEastLane();
-
-        for(int i=0; i < ticks; i++){
-            if(northLane.hasNext()){
-                lights.canMove(northLane.next())
+    private LightsState findByThroughput(LanesConfiguration currentLanesCopy, int timeToMaxWaitingTime, LightsState currentState) {
+        LightsState bestState = null;
+        int maxThroughput = 0;
+        for(LightsState lightsState : allowedLightsStates){
+            int currentThroughput = calculateThroughput(currentLanesCopy, lightsState, currentState, timeToMaxWaitingTime);
+            if(currentThroughput > maxThroughput){
+                maxThroughput = currentThroughput;
+                bestState = lightsState;
             }
         }
+        return bestState;
     }
 
-    private LightsState findBestByPriority(int ticks){
+    private int calculateThroughput(LanesConfiguration lanes, LightsState lights, LightsState currentState, int ticks){
+        LanesConfiguration currentLanesCopy = lanes.clone();
+        int totalThroughput = 0;
+
+        Map<Direction, Boolean> canMove = Map.of(
+                Direction.NORTH, false,
+                Direction.SOUTH, false,
+                Direction.WEST, false,
+                Direction.EAST, false
+        );
+
+//        calculate throughput for lights change
+        if(lights != currentState){
+            ticks--;
+            var temporaryState = currentState.nextState();
+            for(var record : canMove.entrySet()){
+                record.setValue(temporaryState.canMove(currentLanesCopy, record.getKey()));
+            }
+
+            for(var record : canMove.entrySet()){
+                if(record.getValue()){
+                    totalThroughput++;
+                    currentLanesCopy.getLaneByDirection(record.getKey()).passNextVehicle();
+                }
+            }
+        }
+
+        for(int i=0; i < ticks; i++){
+            for(var record : canMove.entrySet()){
+                record.setValue(lights.canMove(currentLanesCopy, record.getKey()));
+            }
+
+            for(var record : canMove.entrySet()){
+                if(record.getValue()){
+                    totalThroughput++;
+                    currentLanesCopy.getLaneByDirection(record.getKey()).passNextVehicle();
+                }
+            }
+        }
+        return totalThroughput;
+    }
+
+    private LightsState findByPriority(LanesConfiguration currentLanesCopy){
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

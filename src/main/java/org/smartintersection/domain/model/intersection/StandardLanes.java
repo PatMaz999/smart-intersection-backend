@@ -5,11 +5,11 @@ import lombok.Getter;
 import java.util.Map;
 
 @Getter
-public class LanesConfiguration {
+public class StandardLanes implements LanesGroup {
     Map<Direction, Lane> lanes;
 
 
-    public LanesConfiguration() {
+    public StandardLanes() {
         this.lanes = Map.of(
                 Direction.NORTH, new StandardLane(Direction.NORTH),
                 Direction.SOUTH, new StandardLane(Direction.SOUTH),
@@ -18,7 +18,7 @@ public class LanesConfiguration {
         );
     }
 
-    private LanesConfiguration(Map<Direction, Lane> lanes, int size) {
+    private StandardLanes(Map<Direction, Lane> lanes, int size) {
         this.lanes = Map.of(
                 Direction.NORTH, lanes.get(Direction.NORTH).clone(size),
                 Direction.SOUTH, lanes.get(Direction.SOUTH).clone(size),
@@ -27,7 +27,7 @@ public class LanesConfiguration {
         );
     }
 
-    private LanesConfiguration(Map<Direction, Lane> lanes) {
+    private StandardLanes(Map<Direction, Lane> lanes) {
         this.lanes = Map.of(
                 Direction.NORTH, lanes.get(Direction.NORTH).clone(),
                 Direction.SOUTH, lanes.get(Direction.SOUTH).clone(),
@@ -47,11 +47,11 @@ public class LanesConfiguration {
         return lanes.get(direction);
     }
 
-    public LanesConfiguration clone(int size){
-        return new LanesConfiguration(lanes, size);
+    public StandardLanes clone(int size){
+        return new StandardLanes(lanes, size);
     }
 
-    public LanesConfiguration clone(){
-        return new LanesConfiguration(lanes);
+    public StandardLanes clone(){
+        return new StandardLanes(lanes);
     }
 }

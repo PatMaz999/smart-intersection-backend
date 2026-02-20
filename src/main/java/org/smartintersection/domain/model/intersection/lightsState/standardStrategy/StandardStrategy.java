@@ -2,7 +2,7 @@ package org.smartintersection.domain.model.intersection.lightsState.standardStra
 
 import org.smartintersection.domain.model.intersection.AbstractTrafficStrategy;
 import org.smartintersection.domain.model.intersection.Direction;
-import org.smartintersection.domain.model.intersection.LanesConfiguration;
+import org.smartintersection.domain.model.intersection.StandardLanes;
 import org.smartintersection.domain.model.intersection.lightsState.LightsState;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public class StandardStrategy extends AbstractTrafficStrategy {
     @Override
     public LightsState findBestState(LightsState currentState) {
         int timeToMaxWaitingTime = maxWaitingTime - getLanes().getMaxPriority();
-        LanesConfiguration currentLanesCopy = getLanes().clone(timeToMaxWaitingTime);
+        StandardLanes currentLanesCopy = getLanes().clone(timeToMaxWaitingTime);
 
         if(timeToMaxWaitingTime > 0){
             return findByThroughput(currentLanesCopy, timeToMaxWaitingTime, currentState);
@@ -47,7 +47,7 @@ public class StandardStrategy extends AbstractTrafficStrategy {
         }
     }
 
-    private LightsState findByThroughput(LanesConfiguration currentLanesCopy, int timeToMaxWaitingTime, LightsState currentState) {
+    private LightsState findByThroughput(StandardLanes currentLanesCopy, int timeToMaxWaitingTime, LightsState currentState) {
         LightsState bestState = null;
         int maxThroughput = 0;
         for(LightsState lightsState : allowedLightsStates){
@@ -60,8 +60,8 @@ public class StandardStrategy extends AbstractTrafficStrategy {
         return bestState;
     }
 
-    private int calculateThroughput(LanesConfiguration lanes, LightsState lights, LightsState currentState, int ticks){
-        LanesConfiguration currentLanesCopy = lanes.clone();
+    private int calculateThroughput(StandardLanes lanes, LightsState lights, LightsState currentState, int ticks){
+        StandardLanes currentLanesCopy = lanes.clone();
         int totalThroughput = 0;
 
         Map<Direction, Boolean> canMove = Map.of(
@@ -102,7 +102,7 @@ public class StandardStrategy extends AbstractTrafficStrategy {
         return totalThroughput;
     }
 
-    private LightsState findByPriority(LanesConfiguration currentLanesCopy){
+    private LightsState findByPriority(StandardLanes currentLanesCopy){
         throw new UnsupportedOperationException("Not supported yet.");
     }
 

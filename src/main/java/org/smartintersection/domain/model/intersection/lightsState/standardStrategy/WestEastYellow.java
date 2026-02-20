@@ -2,7 +2,7 @@ package org.smartintersection.domain.model.intersection.lightsState.standardStra
 
 import org.smartintersection.domain.model.intersection.Direction;
 import org.smartintersection.domain.model.intersection.Lane;
-import org.smartintersection.domain.model.intersection.LanesConfiguration;
+import org.smartintersection.domain.model.intersection.StandardLanes;
 import org.smartintersection.domain.model.intersection.lightsState.AbstractLightsState;
 import org.smartintersection.domain.model.intersection.lightsState.LightColor;
 import org.smartintersection.domain.model.intersection.lightsState.LightsState;
@@ -22,7 +22,7 @@ public class WestEastYellow extends AbstractLightsState {
     }
 
     @Override
-    public boolean canMove(LanesConfiguration lanes, Direction laneDirection) {
+    public boolean canMove(StandardLanes lanes, Direction laneDirection) {
 
         Lane currentLane = lanes.getLane(laneDirection);
 

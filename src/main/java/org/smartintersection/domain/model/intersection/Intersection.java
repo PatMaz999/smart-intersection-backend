@@ -7,7 +7,7 @@ import org.smartintersection.domain.model.intersection.lightsState.LightsState;
 @Getter
 public class Intersection {
 
-    private LanesConfiguration lanesConfiguration;
+    private LanesGroup standardLanes;
 
     private LightsState lightsState;
 

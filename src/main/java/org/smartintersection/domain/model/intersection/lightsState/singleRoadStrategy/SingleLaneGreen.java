@@ -5,25 +5,25 @@ import org.smartintersection.domain.model.intersection.lanes.LanesGroup;
 import org.smartintersection.domain.model.intersection.lightsState.AbstractLightsState;
 import org.smartintersection.domain.model.intersection.lightsState.LightColor;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
-public class ClearancePhase extends AbstractLightsState {
+public class SingleLaneGreen extends AbstractLightsState {
 
-    public ClearancePhase(AbstractLightsState lightsState) {
-        super(removeGreen(lightsState.getLightColors()));
+    public SingleLaneGreen(Direction direction) {
+        super(createMap(direction));
     }
 
-    private static Map<Direction, LightColor> removeGreen(Map<Direction, LightColor> colors) {
-        Map<Direction, LightColor> map = new HashMap<>();
-        for(var s : colors.entrySet()){
-            map.put(s.getKey(), s.getValue() == LightColor.GREEN ? LightColor.YELLOW : LightColor.RED);
+    private static Map<Direction, LightColor> createMap(Direction direction) {
+        Map<Direction, LightColor> map = new EnumMap<>(Direction.class);
+        for (Direction dir : Direction.values()) {
+            map.put(dir, (dir == direction) ? LightColor.GREEN : LightColor.RED);
         }
         return map;
     }
 
     @Override
     public boolean canMove(LanesGroup lanes, Direction direction) {
-        return false;
+        return getColors().get(direction) == LightColor.GREEN;
     }
 }

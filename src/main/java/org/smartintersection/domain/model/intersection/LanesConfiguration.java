@@ -2,52 +2,56 @@ package org.smartintersection.domain.model.intersection;
 
 import lombok.Getter;
 
-import java.util.stream.IntStream;
+import java.util.Map;
 
 @Getter
 public class LanesConfiguration {
-    private Lane northLane;
-    private Lane southLane;
-    private Lane westLane;
-    private Lane eastLane;
+    Map<Direction, Lane> lanes;
 
-    private LanesConfiguration(Lane northLane, Lane southLane, Lane westLane, Lane eastLane, int size) {
-        this.northLane = northLane.clone(size);
-        this.southLane = southLane.clone(size);
-        this.westLane = westLane.clone(size);
-        this.eastLane = eastLane.clone(size);
+
+    public LanesConfiguration() {
+        this.lanes = Map.of(
+                Direction.NORTH, new StandardLane(Direction.NORTH),
+                Direction.SOUTH, new StandardLane(Direction.SOUTH),
+                Direction.WEST, new StandardLane(Direction.WEST),
+                Direction.EAST, new StandardLane(Direction.EAST)
+        );
     }
 
-    private LanesConfiguration(Lane northLane, Lane southLane, Lane westLane, Lane eastLane) {
-        this.northLane = northLane.clone();
-        this.southLane = southLane.clone();
-        this.westLane = westLane.clone();
-        this.eastLane = eastLane.clone();
+    private LanesConfiguration(Map<Direction, Lane> lanes, int size) {
+        this.lanes = Map.of(
+                Direction.NORTH, lanes.get(Direction.NORTH).clone(size),
+                Direction.SOUTH, lanes.get(Direction.SOUTH).clone(size),
+                Direction.WEST, lanes.get(Direction.WEST).clone(size),
+                Direction.EAST, lanes.get(Direction.EAST).clone(size)
+        );
+    }
+
+    private LanesConfiguration(Map<Direction, Lane> lanes) {
+        this.lanes = Map.of(
+                Direction.NORTH, lanes.get(Direction.NORTH).clone(),
+                Direction.SOUTH, lanes.get(Direction.SOUTH).clone(),
+                Direction.WEST, lanes.get(Direction.WEST).clone(),
+                Direction.EAST, lanes.get(Direction.EAST).clone()
+        );
     }
 
     public int getMaxPriority(){
-        return IntStream.of(
-                northLane.getPriority(),
-                southLane.getPriority(),
-                westLane.getPriority(),
-                eastLane.getPriority()
-        ).max().orElse(0);
+        return lanes.values().stream()
+                .mapToInt(Lane::getPriority)
+                .max()
+                .orElse(0);
     }
 
-    public Lane getLaneByDirection(Direction direction){
-        return switch (direction) {
-            case NORTH -> northLane;
-            case SOUTH -> southLane;
-            case WEST  -> westLane;
-            case EAST  -> eastLane;
-        };
+    public Lane getLane(Direction direction){
+        return lanes.get(direction);
     }
 
     public LanesConfiguration clone(int size){
-        return new LanesConfiguration(northLane, southLane, westLane, eastLane, size);
+        return new LanesConfiguration(lanes, size);
     }
 
     public LanesConfiguration clone(){
-        return new LanesConfiguration(northLane, southLane, westLane, eastLane);
+        return new LanesConfiguration(lanes);
     }
 }

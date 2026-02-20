@@ -22,7 +22,7 @@ public class NorthSouthGreen extends AbstractLightsState {
     @Override
     public boolean canMove(LanesConfiguration lanes, Direction laneDirection) {
 
-        Lane currentLane = lanes.getLaneByDirection(laneDirection);
+        Lane currentLane = lanes.getLane(laneDirection);
 
         if (currentLane.getCarsCount() == 0) {
             return false;
@@ -33,7 +33,7 @@ public class NorthSouthGreen extends AbstractLightsState {
         if (laneDirection == Direction.NORTH || laneDirection == Direction.SOUTH) {
             if (carDirection == TurnDirection.LEFT) {
                 Lane oppositeLane = (laneDirection == Direction.NORTH) ?
-                        lanes.getSouthLane() : lanes.getNorthLane();
+                        lanes.getLane(Direction.SOUTH) : lanes.getLane(Direction.NORTH);
                 if (oppositeLane.getCarsCount() == 0)
                     return true;
                 TurnDirection oppositeTurn = oppositeLane.nextCarTurnDirection();
@@ -44,12 +44,12 @@ public class NorthSouthGreen extends AbstractLightsState {
         }
 
         if (laneDirection == Direction.WEST && carDirection == TurnDirection.RIGHT) {
-            TurnDirection northTurn = lanes.getNorthLane().nextCarTurnDirection();
+            TurnDirection northTurn = lanes.getLane(Direction.NORTH).nextCarTurnDirection();
             return northTurn != TurnDirection.STRAIGHT;
         }
 
         if (laneDirection == Direction.EAST && carDirection == TurnDirection.RIGHT) {
-            TurnDirection southTurn = lanes.getSouthLane().nextCarTurnDirection();
+            TurnDirection southTurn = lanes.getLane(Direction.SOUTH).nextCarTurnDirection();
             return southTurn != TurnDirection.STRAIGHT;
         }
 

@@ -21,7 +21,7 @@ public class WestEastGreen extends AbstractLightsState {
     @Override
     public boolean canMove(LanesConfiguration lanes, Direction laneDirection) {
 
-        Lane currentLane = lanes.getLaneByDirection(laneDirection);
+        Lane currentLane = lanes.getLane(laneDirection);
 
         if (currentLane.getCarsCount() == 0) {
             return false;
@@ -32,7 +32,7 @@ public class WestEastGreen extends AbstractLightsState {
         if (laneDirection == Direction.WEST || laneDirection == Direction.EAST) {
             if (carDirection == TurnDirection.LEFT) {
                 Lane oppositeLane = (laneDirection == Direction.WEST) ?
-                        lanes.getEastLane() : lanes.getWestLane();
+                        lanes.getLane(Direction.EAST) : lanes.getLane(Direction.WEST);
                 if (oppositeLane.getCarsCount() == 0)
                     return true;
                 TurnDirection oppositeTurn = oppositeLane.nextCarTurnDirection();
@@ -43,12 +43,12 @@ public class WestEastGreen extends AbstractLightsState {
         }
 
         if (laneDirection == Direction.NORTH && carDirection == TurnDirection.RIGHT) {
-            TurnDirection eastTurn = lanes.getEastLane().nextCarTurnDirection();
+            TurnDirection eastTurn = lanes.getLane(Direction.EAST).nextCarTurnDirection();
             return eastTurn != TurnDirection.STRAIGHT;
         }
 
         if (laneDirection == Direction.SOUTH && carDirection == TurnDirection.RIGHT) {
-            TurnDirection westTurn = lanes.getWestLane().nextCarTurnDirection();
+            TurnDirection westTurn = lanes.getLane(Direction.WEST).nextCarTurnDirection();
             return westTurn != TurnDirection.STRAIGHT;
         }
 

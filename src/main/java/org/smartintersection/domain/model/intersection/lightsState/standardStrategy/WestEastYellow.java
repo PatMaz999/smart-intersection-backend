@@ -24,7 +24,7 @@ public class WestEastYellow extends AbstractLightsState {
     @Override
     public boolean canMove(LanesConfiguration lanes, Direction laneDirection) {
 
-        Lane currentLane = lanes.getLaneByDirection(laneDirection);
+        Lane currentLane = lanes.getLane(laneDirection);
 
         if (currentLane.getCarsCount() == 0) {
             return false;

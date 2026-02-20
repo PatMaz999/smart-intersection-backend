@@ -27,10 +27,10 @@ public class StandardStrategy extends AbstractTrafficStrategy {
 
     @Override
     public LightsState getInitialState() {
-        int verticalCarSum = getLanes().getNorthLane().getCarsCount() +
-                getLanes().getSouthLane().getCarsCount();
-        int horizontalCarSum = getLanes().getWestLane().getCarsCount() +
-                getLanes().getEastLane().getCarsCount();
+        int verticalCarSum = getLanes().getLane(Direction.NORTH).getCarsCount() +
+                getLanes().getLane(Direction.SOUTH).getCarsCount();
+        int horizontalCarSum = getLanes().getLane(Direction.WEST).getCarsCount() +
+                getLanes().getLane(Direction.EAST).getCarsCount();
         return verticalCarSum >= horizontalCarSum ? new NorthSouthGreen() : new WestEastGreen();
     }
 
@@ -82,7 +82,7 @@ public class StandardStrategy extends AbstractTrafficStrategy {
             for(var record : canMove.entrySet()){
                 if(record.getValue()){
                     totalThroughput++;
-                    currentLanesCopy.getLaneByDirection(record.getKey()).passNextVehicle();
+                    currentLanesCopy.getLane(record.getKey()).passNextVehicle();
                 }
             }
         }
@@ -95,7 +95,7 @@ public class StandardStrategy extends AbstractTrafficStrategy {
             for(var record : canMove.entrySet()){
                 if(record.getValue()){
                     totalThroughput++;
-                    currentLanesCopy.getLaneByDirection(record.getKey()).passNextVehicle();
+                    currentLanesCopy.getLane(record.getKey()).passNextVehicle();
                 }
             }
         }

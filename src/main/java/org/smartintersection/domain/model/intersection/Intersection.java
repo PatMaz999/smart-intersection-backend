@@ -1,17 +1,9 @@
 package org.smartintersection.domain.model.intersection;
 
-import lombok.Getter;
-import lombok.Setter;
-import org.smartintersection.domain.model.intersection.lightsState.LightsState;
+import org.smartintersection.domain.model.vehicle.Vehicle;
 
-@Getter
-public class Intersection {
+import java.util.List;
 
-    private LanesGroup standardLanes;
-
-    private LightsState lightsState;
-
-    @Setter
-    private TrafficStrategy currentStrategy;
-
+public interface Intersection {
+    void proceed(List<Vehicle> leavingVehicles);
 }

@@ -1,7 +1,7 @@
 package org.smartintersection.domain.model.intersection.lightsState;
 
 import org.smartintersection.domain.model.intersection.Direction;
-import org.smartintersection.domain.model.intersection.StandardLanes;
+import org.smartintersection.domain.model.intersection.lanes.StandardLanes;
 
 import java.util.Map;
 

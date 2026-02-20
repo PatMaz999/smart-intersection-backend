@@ -1,6 +1,7 @@
-package org.smartintersection.domain.model.intersection;
+package org.smartintersection.domain.model.intersection.lanes;
 
 import lombok.Getter;
+import org.smartintersection.domain.model.intersection.Direction;
 
 import java.util.Map;
 

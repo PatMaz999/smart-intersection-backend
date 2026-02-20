@@ -1,5 +1,6 @@
-package org.smartintersection.domain.model.intersection;
+package org.smartintersection.domain.model.intersection.lanes;
 
+import org.smartintersection.domain.model.intersection.Direction;
 import org.smartintersection.domain.model.vehicle.TurnDirection;
 import org.smartintersection.domain.model.vehicle.Vehicle;
 

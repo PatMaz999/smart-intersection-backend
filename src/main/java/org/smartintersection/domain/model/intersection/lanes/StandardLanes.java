@@ -2,8 +2,12 @@ package org.smartintersection.domain.model.intersection.lanes;
 
 import lombok.Getter;
 import org.smartintersection.domain.model.intersection.Direction;
+import org.smartintersection.domain.model.vehicle.Vehicle;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @Getter
 public class StandardLanes implements LanesGroup {
@@ -37,6 +41,7 @@ public class StandardLanes implements LanesGroup {
         );
     }
 
+    @Override
     public int getMaxPriority(){
         return lanes.values().stream()
                 .mapToInt(Lane::getPriority)
@@ -48,10 +53,21 @@ public class StandardLanes implements LanesGroup {
         return lanes.get(direction);
     }
 
+    @Override
+    public List<Vehicle> passVehicles(Set<Direction> directions) {
+        List<Vehicle> vehicles = new ArrayList<>();
+        for(Direction direction : directions){
+            vehicles.add(lanes.get(direction).passNextVehicle());
+        }
+        return vehicles;
+    }
+
+    @Override
     public StandardLanes clone(int size){
         return new StandardLanes(lanes, size);
     }
 
+    @Override
     public StandardLanes clone(){
         return new StandardLanes(lanes);
     }

@@ -1,12 +1,12 @@
 package org.smartintersection.domain.model.intersection.lightsState;
 
 import org.smartintersection.domain.model.intersection.Direction;
-import org.smartintersection.domain.model.intersection.lanes.StandardLanes;
+import org.smartintersection.domain.model.intersection.lanes.LanesGroup;
 
 import java.util.Map;
 
 public interface LightsState {
-    boolean canMove(StandardLanes lanes, Direction direction);
+    boolean canMove(LanesGroup lanes, Direction direction);
     LightsState nextState();
     boolean isClearancePhase();
     Map<Direction, LightColor> getLightColors();

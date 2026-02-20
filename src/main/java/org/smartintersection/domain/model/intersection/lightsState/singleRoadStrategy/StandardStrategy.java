@@ -2,6 +2,7 @@ package org.smartintersection.domain.model.intersection.lightsState.singleRoadSt
 
 import org.smartintersection.domain.model.intersection.Direction;
 import org.smartintersection.domain.model.intersection.Intersection;
+import org.smartintersection.domain.model.intersection.lanes.LanesGroup;
 import org.smartintersection.domain.model.intersection.lanes.StandardLanes;
 import org.smartintersection.domain.model.intersection.lightsState.LightsState;
 
@@ -29,12 +30,12 @@ public class StandardStrategy extends AbstractTrafficStrategy {
     }
 
     @Override
-    public boolean shouldChange() {
+    public boolean shouldChangeLights() {
         return statesQueue.peek().timeLeft() <= 0;
     }
 
     @Override
-    public LightsState changeState() {
+    public LightsState changeLightsState() {
         if(statesQueue.isEmpty())
 //            TODO:
             refillQueue(intersection.getLightsState());
@@ -75,7 +76,7 @@ public class StandardStrategy extends AbstractTrafficStrategy {
         return bestState;
     }
 
-    private int calculateThroughput(StandardLanes lanes, LightsState lights, LightsState currentState, int ticks){
+    private int calculateThroughput(LanesGroup lanes, LightsState lights, LightsState currentState, int ticks){
         StandardLanes currentLanesCopy = lanes.clone();
         int totalThroughput = 0;
 

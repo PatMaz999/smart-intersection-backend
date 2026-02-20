@@ -2,6 +2,7 @@ package org.smartintersection.domain.model.intersection.lightsState.singleRoadSt
 
 import org.smartintersection.domain.model.intersection.Direction;
 import org.smartintersection.domain.model.intersection.lanes.Lane;
+import org.smartintersection.domain.model.intersection.lanes.LanesGroup;
 import org.smartintersection.domain.model.intersection.lanes.StandardLanes;
 import org.smartintersection.domain.model.intersection.lightsState.AbstractLightsState;
 import org.smartintersection.domain.model.intersection.lightsState.LightColor;
@@ -23,7 +24,7 @@ public class NorthSouthYellow extends AbstractLightsState {
     }
 
     @Override
-    public boolean canMove(StandardLanes lanes, Direction laneDirection) {
+    public boolean canMove(LanesGroup lanes, Direction laneDirection) {
 
         Lane currentLane = lanes.getLane(laneDirection);
 

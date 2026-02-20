@@ -6,6 +6,6 @@ import org.smartintersection.domain.model.vehicle.Vehicle;
 import java.util.List;
 
 public interface Intersection {
-    void proceed(List<Vehicle> leavingVehicles);
     LightsState getLightsState();
+    List<Vehicle> proceed();
 }

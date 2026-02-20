@@ -7,7 +7,9 @@ import org.smartintersection.domain.model.intersection.lightsState.LightsState;
 import org.smartintersection.domain.model.intersection.lightsState.TrafficStrategy;
 import org.smartintersection.domain.model.vehicle.Vehicle;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 public class StandardIntersection implements Intersection {
@@ -20,7 +22,15 @@ public class StandardIntersection implements Intersection {
     private TrafficStrategy currentStrategy;
 
     @Override
-    public void proceed(List<Vehicle> leavingVehicles) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public List<Vehicle> proceed() {
+        if(currentStrategy.shouldChangeLights())
+            lightsState = currentStrategy.changeLightsState();
+
+        Set<Direction> moveSet = new HashSet<>();
+        for(Direction direction : Direction.values()){
+            if(lightsState.canMove(standardLanes, direction))
+                moveSet.add(direction);
+        }
+        return standardLanes.passVehicles(moveSet);
     }
 }

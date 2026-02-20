@@ -7,13 +7,7 @@ import java.util.Map;
 
 public interface LightsState {
     boolean canMove(LanesGroup lanes, Direction direction);
-    LightsState nextState();
     boolean isClearancePhase();
     Map<Direction, LightColor> getLightColors();
-
-//TODO: change to LightColor getColor(Direction direction);
-    LightColor getNorthColor();
-    LightColor getSouthColor();
-    LightColor getEastColor();
-    LightColor getWestColor();
+    LightColor getColor(Direction direction);
 }

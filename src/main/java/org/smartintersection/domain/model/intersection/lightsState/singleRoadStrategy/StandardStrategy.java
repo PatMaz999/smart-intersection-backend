@@ -1,17 +1,21 @@
 package org.smartintersection.domain.model.intersection.lightsState.singleRoadStrategy;
 
 import org.smartintersection.domain.model.intersection.Direction;
+import org.smartintersection.domain.model.intersection.Intersection;
 import org.smartintersection.domain.model.intersection.lanes.StandardLanes;
 import org.smartintersection.domain.model.intersection.lightsState.LightsState;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 public class StandardStrategy extends AbstractTrafficStrategy {
 
 //    private static final int REQUIRED_PRIORITY = 6;
 
+    private Intersection intersection;
     private List<LightsState> allowedLightsStates;
+    private Queue<ScheduledState> statesQueue;
     private int maxWaitingTime;
 
     public StandardStrategy(List<LightsState> lightsStates) {
@@ -25,6 +29,19 @@ public class StandardStrategy extends AbstractTrafficStrategy {
     }
 
     @Override
+    public boolean shouldChange() {
+        return statesQueue.peek().timeLeft() <= 0;
+    }
+
+    @Override
+    public LightsState changeState() {
+        if(statesQueue.isEmpty())
+//            TODO:
+            refillQueue(intersection.getLightsState());
+        return statesQueue.poll().state();
+    }
+
+    @Override
     public LightsState getInitialState() {
         int verticalCarSum = getLanes().getLane(Direction.NORTH).getCarsCount() +
                 getLanes().getLane(Direction.SOUTH).getCarsCount();
@@ -32,9 +49,8 @@ public class StandardStrategy extends AbstractTrafficStrategy {
                 getLanes().getLane(Direction.EAST).getCarsCount();
         return verticalCarSum >= horizontalCarSum ? new NorthSouthGreen() : new WestEastGreen();
     }
-
-    @Override
-    public LightsState findBestState(LightsState currentState) {
+    
+    public LightsState refillQueue(LightsState currentState) {
         int timeToMaxWaitingTime = maxWaitingTime - getLanes().getMaxPriority();
         StandardLanes currentLanesCopy = getLanes().clone(timeToMaxWaitingTime);
 

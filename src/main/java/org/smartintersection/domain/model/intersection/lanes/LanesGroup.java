@@ -12,6 +12,9 @@ public interface LanesGroup {
     Lane getLane(Direction direction);
     List<Vehicle> passVehicles(Set<Direction> directions);
     int getMaxPriority();
+    Direction getMaxPriorityDirection();
+    int getTotalVehicles();
+
     StandardLanes clone(int size);
     StandardLanes clone();
 }

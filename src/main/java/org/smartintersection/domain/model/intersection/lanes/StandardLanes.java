@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Comparator;
 
 @Getter
 public class StandardLanes implements LanesGroup {
@@ -47,6 +48,21 @@ public class StandardLanes implements LanesGroup {
                 .mapToInt(Lane::getPriority)
                 .max()
                 .orElse(0);
+    }
+
+    @Override
+    public Direction getMaxPriorityDirection(){
+        return lanes.entrySet().stream()
+                .max(Map.Entry.comparingByValue(Comparator.comparingInt(Lane::getPriority)))
+                .map(Map.Entry::getKey)
+                .orElse(null);
+    }
+
+    @Override
+    public int getTotalVehicles() {
+        return lanes.values().stream()
+                .mapToInt(Lane::getCarsCount)
+                .sum();
     }
 
     public Lane getLane(Direction direction){

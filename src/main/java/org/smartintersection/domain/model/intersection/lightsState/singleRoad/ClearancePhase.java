@@ -1,16 +1,17 @@
-package org.smartintersection.domain.model.intersection.lightsState.singleRoadStrategy;
+package org.smartintersection.domain.model.intersection.lightsState.singleRoad;
 
 import org.smartintersection.domain.model.intersection.Direction;
 import org.smartintersection.domain.model.intersection.lanes.LanesGroup;
 import org.smartintersection.domain.model.intersection.lightsState.AbstractLightsState;
 import org.smartintersection.domain.model.intersection.lightsState.LightColor;
+import org.smartintersection.domain.model.intersection.lightsState.LightsState;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ClearancePhase extends AbstractLightsState {
 
-    public ClearancePhase(AbstractLightsState lightsState) {
+    public ClearancePhase(LightsState lightsState) {
         super(removeGreen(lightsState.getLightColors()));
     }
 

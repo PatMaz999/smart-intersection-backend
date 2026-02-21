@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.smartintersection.domain.model.intersection.lanes.LanesGroup;
 import org.smartintersection.domain.model.intersection.lightsState.LightsState;
-import org.smartintersection.domain.model.intersection.lightsState.TrafficStrategy;
+import org.smartintersection.domain.model.intersection.trafficStrategy.TrafficStrategy;
 import org.smartintersection.domain.model.vehicle.Vehicle;
 
 import java.util.HashSet;

@@ -1,39 +1,31 @@
-package org.smartintersection.domain.model.intersection.lightsState.singleRoadStrategy;
+package org.smartintersection.domain.model.intersection.trafficStrategy;
 
 import org.smartintersection.domain.model.intersection.Direction;
 import org.smartintersection.domain.model.intersection.lanes.Lane;
 import org.smartintersection.domain.model.intersection.lanes.LanesGroup;
 import org.smartintersection.domain.model.intersection.lightsState.LightColor;
 import org.smartintersection.domain.model.intersection.lightsState.LightsState;
-import org.smartintersection.domain.model.intersection.lightsState.TrafficStrategy;
+import org.smartintersection.domain.model.intersection.lightsState.singleRoad.*;
 import org.smartintersection.domain.model.vehicle.TurnDirection;
 
+import java.util.Queue;
 import java.util.Set;
 
 public class StandardStrategy implements TrafficStrategy {
 
-//    private Queue<ScheduledState> statesQueue;
+    private Queue<ScheduledState> statesQueue;
     private int warningWaitingTime;
     private int maxWaitingTime;
 
-
-//    @Override
-//    public boolean shouldChangeLights(LanesGroup lanes) {
-//        return requiresDedicatedLeftTurn(lanes)
-//                || (!statesQueue.isEmpty() && statesQueue.peek().timeLeft() <= 0);
-//    }
-
     @Override
     public LightsState changeLightsState(LanesGroup lanes, LightsState currentState) {
-        return refillQueue(lanes, currentState);
-//        if (statesQueue.isEmpty())
-////            TODO:
-//            refillQueue(intersection.getLightsState());
-//        return statesQueue.poll().state();
+        if (statesQueue.isEmpty())
+            refillQueue(lanes, currentState);
+        return statesQueue.poll().state();
     }
 
     @Override
-    public LightsState getInitialState(LanesGroup lanes, LightsState currentState) {
+    public LightsState getInitialState(LanesGroup lanes) {
         int verticalCarSum = lanes.getLane(Direction.NORTH).getCarsCount() +
                 lanes.getLane(Direction.SOUTH).getCarsCount();
         int horizontalCarSum = lanes.getLane(Direction.WEST).getCarsCount() +
@@ -43,34 +35,39 @@ public class StandardStrategy implements TrafficStrategy {
                 new StraightLineGreen(Direction.WEST);
     }
 
-    //    TODO: add yellow light logic
-    public LightsState refillQueue(LanesGroup lanes, LightsState currentState) {
+    public void refillQueue(LanesGroup lanes, LightsState currentState) {
 //        empty
-        if(lanes.getTotalVehicles() == 0)
-            return currentState.isOptimal() ? currentState : getInitialState(lanes, currentState);
+        if (lanes.getTotalVehicles() == 0) {
+            if (currentState.isOptimal()) {
+                extendCurrentPhase(currentState);
+                return;
+            } else {
+                wrapWithClearancePhase(currentState, getInitialState(lanes));
+                return;
+            }
+        }
 
 //        only green empty
         Set<Direction> greenDirections = currentState.getByColor(LightColor.GREEN);
         int carsOnGreen = 0;
-        for(Direction direction : greenDirections) {
+        for (Direction direction : greenDirections) {
             carsOnGreen += lanes.getLane(direction).getCarsCount();
         }
-        if(carsOnGreen == 0)
-            return new StraightLineGreen(
-                    greenDirections
-                    .iterator().next()
-                    .getRight()
-            );
+        if (carsOnGreen == 0) {
+            Direction newDirection = greenDirections.iterator().next().getRight();
+            wrapWithClearancePhase(currentState, new StraightLineGreen(newDirection));
+            return;
+        }
 
 //        too long waiting time
         int currentWaitingTime = lanes.getMaxPriority();
-        if(currentWaitingTime > warningWaitingTime){
+        if (currentWaitingTime > warningWaitingTime) {
             Direction priorityDirection = lanes.getMaxPriorityDirection();
 
             Lane oppositeLane = lanes.getLane(priorityDirection.getOpposite());
             int seriesOfCollidingCars = 0;
-            for(var x: oppositeLane.getQueue()){
-                if(x.getTurnDirection() != TurnDirection.LEFT)
+            for (var x : oppositeLane.getQueue()) {
+                if (x.getTurnDirection() != TurnDirection.LEFT)
                     seriesOfCollidingCars++;
                 else
                     break;
@@ -78,17 +75,36 @@ public class StandardStrategy implements TrafficStrategy {
             int totalWaitingTime = currentWaitingTime + seriesOfCollidingCars;
 
             if (totalWaitingTime >= maxWaitingTime) {
-                return new SingleLaneGreen(priorityDirection);
+                swapToOneLine(currentState, priorityDirection);
+                return;
             }
             if (greenDirections.contains(priorityDirection)) {
-                return currentState;
+                extendCurrentPhase(currentState);
+                return;
             }
-            return new StraightLineGreen(priorityDirection);
+            wrapWithClearancePhase(currentState, new StraightLineGreen(priorityDirection));
+            return;
         }
 
-        return currentState;
+        extendCurrentPhase(currentState);
+//        return;
     }
 
+    private void swapToOneLine(LightsState currentState, Direction priorityDirection) {
+        statesQueue.add(new ScheduledState(new ClearSingleLine(currentState, priorityDirection.getOpposite()), 1));
+        statesQueue.add(new ScheduledState(new SingleLaneGreen(priorityDirection), 5));
+    }
+
+    private void wrapWithClearancePhase(LightsState currentState, LightsState newState) {
+        statesQueue.add(new ScheduledState(new ClearancePhase(currentState), 1));
+        statesQueue.add(new ScheduledState(newState, 5));
+    }
+
+    private void extendCurrentPhase(LightsState currentState) {
+        statesQueue.add(new ScheduledState(currentState, 5));
+    }
+
+    //    TODO: to remove
     private boolean requiresDedicatedLeftTurn(LanesGroup lanes) {
         for (Lane lane : lanes.getLanes().values()) {
             if (lane.nextCarTurnDirection() != TurnDirection.LEFT)

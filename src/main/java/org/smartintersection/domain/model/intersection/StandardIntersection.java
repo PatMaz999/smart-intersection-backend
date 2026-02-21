@@ -21,6 +21,12 @@ public class StandardIntersection implements Intersection {
     @Setter
     private TrafficStrategy currentStrategy;
 
+    public StandardIntersection(LanesGroup standardLanes, TrafficStrategy currentStrategy) {
+        this.standardLanes = standardLanes;
+        this.currentStrategy = currentStrategy;
+        this.lightsState = currentStrategy.getInitialState(standardLanes);
+    }
+
     @Override
     public List<Vehicle> proceed() {
 //        if(currentStrategy.shouldChangeLights())

@@ -5,6 +5,8 @@ import org.smartintersection.domain.model.intersection.Intersection;
 import org.smartintersection.domain.model.vehicle.Car;
 import org.smartintersection.domain.model.vehicle.VehicleId;
 
+import java.util.Optional;
+
 public class addVehicle implements Command {
 
     VehicleId vehicleId;
@@ -12,7 +14,8 @@ public class addVehicle implements Command {
     Direction endRoad;
 
     @Override
-    public void execute(Intersection intersection) {
+    public Optional<CommandResult> execute(Intersection intersection) {
         intersection.addVehicle(new Car(vehicleId, startRoad, endRoad), startRoad);
+        return Optional.empty();
     }
 }

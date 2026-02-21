@@ -2,6 +2,8 @@ package org.smartintersection.application.command;
 
 import org.smartintersection.domain.model.intersection.Intersection;
 
+import java.util.Optional;
+
 public interface Command {
-    void execute(Intersection intersection);
+    Optional<CommandResult> execute(Intersection intersection);
 }

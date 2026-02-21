@@ -8,6 +8,7 @@ import org.smartintersection.domain.model.intersection.lightsState.LightsState;
 import org.smartintersection.domain.model.intersection.lightsState.singleRoad.*;
 import org.smartintersection.domain.model.vehicle.TurnDirection;
 
+import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
@@ -16,6 +17,18 @@ public class StandardStrategy implements TrafficStrategy {
     private Queue<ScheduledState> statesQueue;
     private int warningWaitingTime;
     private int maxWaitingTime;
+
+    public StandardStrategy() {
+        this.statesQueue = new LinkedList<>();
+        this.warningWaitingTime = 12;
+        this.maxWaitingTime = 16;
+    }
+
+    public StandardStrategy(int warningWaitingTime, int maxWaitingTime) {
+        this.statesQueue = new LinkedList<>();
+        this.warningWaitingTime = warningWaitingTime;
+        this.maxWaitingTime = maxWaitingTime;
+    }
 
     @Override
     public LightsState changeLightsState(LanesGroup lanes, LightsState currentState) {

@@ -1,4 +1,4 @@
-package org.smartintersection.domain.model.intersection.lightsState.singleRoad;
+package org.smartintersection.domain.model.intersection.trafficStrategy;
 
 import org.smartintersection.domain.model.intersection.lightsState.LightsState;
 

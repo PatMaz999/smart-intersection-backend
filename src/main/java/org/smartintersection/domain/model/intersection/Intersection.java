@@ -8,4 +8,5 @@ import java.util.List;
 public interface Intersection {
     LightsState getLightsState();
     List<Vehicle> proceed();
+    void addVehicle(Vehicle vehicle, Direction direction);
 }

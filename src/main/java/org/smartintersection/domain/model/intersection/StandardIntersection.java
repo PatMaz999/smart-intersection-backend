@@ -34,4 +34,9 @@ public class StandardIntersection implements Intersection {
         }
         return standardLanes.passVehicles(moveSet);
     }
+
+    @Override
+    public void addVehicle(Vehicle vehicle, Direction direction) {
+        standardLanes.addVehicle(vehicle, direction);
+    }
 }

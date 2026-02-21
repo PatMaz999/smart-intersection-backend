@@ -1,0 +1,18 @@
+package org.smartintersection.application.command;
+
+import org.smartintersection.domain.model.intersection.Direction;
+import org.smartintersection.domain.model.intersection.Intersection;
+import org.smartintersection.domain.model.vehicle.Car;
+import org.smartintersection.domain.model.vehicle.VehicleId;
+
+public class addVehicle implements Command {
+
+    VehicleId vehicleId;
+    Direction startRoad;
+    Direction endRoad;
+
+    @Override
+    public void execute(Intersection intersection) {
+        intersection.addVehicle(new Car(vehicleId, startRoad, endRoad), startRoad);
+    }
+}

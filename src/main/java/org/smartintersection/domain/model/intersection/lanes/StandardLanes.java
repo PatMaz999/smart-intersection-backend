@@ -65,6 +65,11 @@ public class StandardLanes implements LanesGroup {
                 .sum();
     }
 
+    @Override
+    public void addVehicle(Vehicle vehicle, Direction direction) {
+        lanes.get(direction).addVehicle(vehicle);
+    }
+
     public Lane getLane(Direction direction){
         return lanes.get(direction);
     }

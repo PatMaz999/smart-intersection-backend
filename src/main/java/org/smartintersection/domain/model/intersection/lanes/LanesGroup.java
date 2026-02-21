@@ -14,6 +14,7 @@ public interface LanesGroup {
     int getMaxPriority();
     Direction getMaxPriorityDirection();
     int getTotalVehicles();
+    void addVehicle(Vehicle vehicle, Direction direction);
 
     StandardLanes clone(int size);
     StandardLanes clone();

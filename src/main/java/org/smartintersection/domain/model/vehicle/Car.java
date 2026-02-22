@@ -5,13 +5,21 @@ import org.smartintersection.domain.model.intersection.Direction;
 
 @Getter
 public class Car implements Vehicle {
-    private VehicleId id;
+    private final VehicleId id;
     private TurnDirection turnDirection;
     private int priority;
 
     public Car(VehicleId id, Direction startDirection, Direction endDirection) {
+        if(startDirection == endDirection)
+            throw new IllegalArgumentException();
         this.id = id;
         this.turnDirection = TurnDirection.from(startDirection, endDirection);
+        this.priority = 0;
+    }
+
+    public Car(TurnDirection turnDirection) {
+        this.id = new VehicleId();
+        this.turnDirection = turnDirection;
         this.priority = 0;
     }
 

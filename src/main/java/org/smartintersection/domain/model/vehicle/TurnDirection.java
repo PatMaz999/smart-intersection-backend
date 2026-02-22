@@ -1,6 +1,7 @@
 package org.smartintersection.domain.model.vehicle;
 
 import org.smartintersection.domain.model.intersection.Direction;
+import org.smartintersection.exception.IllegalTurnException;
 
 public enum TurnDirection {
     LEFT, STRAIGHT, RIGHT;
@@ -16,6 +17,6 @@ public enum TurnDirection {
             return LEFT;
         }
 
-        throw new IllegalArgumentException("Unsupported turn direction " + start + " to " + end);
+        throw new IllegalTurnException(start, end);
     }
 }

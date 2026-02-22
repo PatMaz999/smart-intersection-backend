@@ -1,6 +1,7 @@
 package org.smartintersection.domain.model.intersection.lightsState.singleRoad;
 
 import org.smartintersection.domain.model.intersection.Direction;
+import org.smartintersection.domain.model.intersection.lanes.Lane;
 import org.smartintersection.domain.model.intersection.lanes.LanesGroup;
 import org.smartintersection.domain.model.intersection.lightsState.AbstractLightsState;
 import org.smartintersection.domain.model.intersection.lightsState.LightColor;
@@ -24,6 +25,11 @@ public class SingleLaneGreen extends AbstractLightsState {
 
     @Override
     public boolean canMove(LanesGroup lanes, Direction direction) {
+
+        Lane currentLane = lanes.getLane(direction);
+        if(currentLane.getCarsCount() == 0 )
+            return false;
+
         return getColors().get(direction) == LightColor.GREEN;
     }
 }

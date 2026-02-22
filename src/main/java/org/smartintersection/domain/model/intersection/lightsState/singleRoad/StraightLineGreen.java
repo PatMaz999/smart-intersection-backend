@@ -40,26 +40,25 @@ public class StraightLineGreen extends AbstractLightsState {
     }
 
     @Override
-    public boolean canMove(LanesGroup lanes, Direction laneDirection) {
-        Lane currentLane = lanes.getLane(laneDirection);
-
-        if (currentLane.getCarsCount() == 0) {
+    public boolean canMove(LanesGroup lanes, Direction direction) {
+        if(getColors().get(direction) != LightColor.GREEN)
             return false;
-        }
 
-        TurnDirection carDirection = currentLane.nextCarTurnDirection();
-        if(getColor(laneDirection) == LightColor.GREEN){
-            if(carDirection == TurnDirection.RIGHT ||  carDirection == TurnDirection.STRAIGHT)
-                return true;
-            if(carDirection == TurnDirection.LEFT){
-                Direction oppositeLaneDirection = laneDirection.getOpposite();
-                Lane oppositeLane = lanes.getLane(oppositeLaneDirection);
-                if(oppositeLane.getCarsCount() == 0)
-                    return true;
-                TurnDirection oppositeTurn = oppositeLane.nextCarTurnDirection();
-                return oppositeTurn == TurnDirection.LEFT;
-            }
-        }
-        return false;
+        Lane currentLane = lanes.getLane(direction);
+
+        if(currentLane.getCarsCount() == 0 )
+            return false;
+
+        TurnDirection turnDirection = currentLane.nextCarTurnDirection();
+
+        if(turnDirection != TurnDirection.LEFT)
+            return true;
+
+        Lane oppositeLane = lanes.getLane(direction.getOpposite());
+        if(oppositeLane.getCarsCount()  == 0 )
+            return true;
+
+        TurnDirection oppositeTurnDirection = oppositeLane.nextCarTurnDirection();
+        return oppositeTurnDirection == TurnDirection.LEFT;
     }
 }

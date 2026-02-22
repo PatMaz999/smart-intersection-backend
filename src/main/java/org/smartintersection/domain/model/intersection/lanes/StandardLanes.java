@@ -23,24 +23,6 @@ public class StandardLanes implements LanesGroup {
         );
     }
 
-    private StandardLanes(Map<Direction, Lane> lanes, int size) {
-        this.lanes = Map.of(
-                Direction.NORTH, lanes.get(Direction.NORTH).clone(size),
-                Direction.SOUTH, lanes.get(Direction.SOUTH).clone(size),
-                Direction.WEST, lanes.get(Direction.WEST).clone(size),
-                Direction.EAST, lanes.get(Direction.EAST).clone(size)
-        );
-    }
-
-    private StandardLanes(Map<Direction, Lane> lanes) {
-        this.lanes = Map.of(
-                Direction.NORTH, lanes.get(Direction.NORTH).clone(),
-                Direction.SOUTH, lanes.get(Direction.SOUTH).clone(),
-                Direction.WEST, lanes.get(Direction.WEST).clone(),
-                Direction.EAST, lanes.get(Direction.EAST).clone()
-        );
-    }
-
     @Override
     public int getMaxPriority(){
         return lanes.values().stream()
@@ -85,15 +67,5 @@ public class StandardLanes implements LanesGroup {
             vehicles.add(lanes.get(direction).passNextVehicle());
         }
         return vehicles;
-    }
-
-    @Override
-    public StandardLanes clone(int size){
-        return new StandardLanes(lanes, size);
-    }
-
-    @Override
-    public StandardLanes clone(){
-        return new StandardLanes(lanes);
     }
 }

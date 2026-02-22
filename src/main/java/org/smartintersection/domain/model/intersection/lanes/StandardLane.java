@@ -8,7 +8,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Queue;
-import java.util.stream.Collectors;
 
 public class StandardLane implements Lane {
     private Queue<Vehicle> queue;
@@ -16,18 +15,6 @@ public class StandardLane implements Lane {
 
     public StandardLane(Direction direction) {
         this.queue = new LinkedList<>();
-        this.direction = direction;
-    }
-
-    private StandardLane(Queue<Vehicle> queue, int queueSize, Direction direction) {
-        this.queue = queue.stream()
-                .limit(queueSize)
-                .collect(Collectors.toCollection(LinkedList::new));
-        this.direction = direction;
-    }
-
-    private StandardLane(Queue<Vehicle> queue, Direction direction) {
-        this.queue = new LinkedList<>(queue);
         this.direction = direction;
     }
 
@@ -70,15 +57,5 @@ public class StandardLane implements Lane {
     @Override
     public Collection<Vehicle> getQueue(){
         return Collections.unmodifiableCollection(queue);
-    }
-
-    @Override
-    public Lane clone(int size){
-        return new StandardLane(queue, size, direction);
-    }
-
-    @Override
-    public Lane clone() {
-        return new StandardLane(queue, direction);
     }
 }

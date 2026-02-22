@@ -16,6 +16,4 @@ public interface Lane {
     void incrementPriority();
     TurnDirection nextCarTurnDirection();
     Collection<Vehicle> getQueue();
-    Lane clone(int size);
-    Lane clone();
 }

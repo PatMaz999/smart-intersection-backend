@@ -9,15 +9,15 @@ import org.smartintersection.domain.model.intersection.lightsState.LightsState;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ClearSingleLine extends AbstractLightsState {
+public class ClearSingleLane extends AbstractLightsState {
 
-    public ClearSingleLine(LightsState lightsState, Direction direction) {
+    public ClearSingleLane(LightsState lightsState, Direction direction) {
         super(removeGreen(lightsState.getLightColors(), direction));
     }
 
     private static Map<Direction, LightColor> removeGreen(Map<Direction, LightColor> colors, Direction direction) {
         Map<Direction, LightColor> map = new HashMap<>(colors);
-        map.replace(direction, LightColor.RED);
+        map.replace(direction, LightColor.YELLOW);
         return map;
     }
 

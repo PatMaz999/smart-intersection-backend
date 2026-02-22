@@ -8,6 +8,7 @@ import org.smartintersection.domain.model.intersection.lightsState.LightColor;
 import org.smartintersection.domain.model.vehicle.TurnDirection;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class StraightLineGreen extends AbstractLightsState {
 
@@ -46,19 +47,16 @@ public class StraightLineGreen extends AbstractLightsState {
 
         Lane currentLane = lanes.getLane(direction);
 
-        if(currentLane.getCarsCount() == 0 )
+        Optional<TurnDirection> turnDirection = currentLane.nextCarTurnDirection();
+
+        if(turnDirection.isEmpty())
             return false;
 
-        TurnDirection turnDirection = currentLane.nextCarTurnDirection();
-
-        if(turnDirection != TurnDirection.LEFT)
+        if(turnDirection.get() != TurnDirection.LEFT)
             return true;
 
         Lane oppositeLane = lanes.getLane(direction.getOpposite());
-        if(oppositeLane.getCarsCount()  == 0 )
-            return true;
-
-        TurnDirection oppositeTurnDirection = oppositeLane.nextCarTurnDirection();
-        return oppositeTurnDirection == TurnDirection.LEFT;
+        Optional<TurnDirection> oppositeTurnDirection = oppositeLane.nextCarTurnDirection();
+        return oppositeTurnDirection.isPresent() && oppositeTurnDirection.get() == TurnDirection.LEFT;
     }
 }

@@ -5,6 +5,7 @@ import org.smartintersection.domain.model.vehicle.TurnDirection;
 import org.smartintersection.domain.model.vehicle.Vehicle;
 
 import java.util.Collection;
+import java.util.Optional;
 
 //TODO: refactor
 public interface Lane {
@@ -14,6 +15,6 @@ public interface Lane {
     Direction getDirection();
     int getPriority();
     void incrementPriority();
-    TurnDirection nextCarTurnDirection();
+    Optional<TurnDirection> nextCarTurnDirection();
     Collection<Vehicle> getQueue();
 }

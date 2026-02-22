@@ -10,8 +10,6 @@ public class Car implements Vehicle {
     private int priority;
 
     public Car(VehicleId id, Direction startDirection, Direction endDirection) {
-        if(startDirection == endDirection)
-            throw new IllegalArgumentException();
         this.id = id;
         this.turnDirection = TurnDirection.from(startDirection, endDirection);
         this.priority = 0;

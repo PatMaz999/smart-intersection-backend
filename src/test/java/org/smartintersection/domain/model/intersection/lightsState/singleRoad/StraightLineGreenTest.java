@@ -13,6 +13,7 @@ import org.smartintersection.domain.model.intersection.lightsState.LightColor;
 import org.smartintersection.domain.model.vehicle.TurnDirection;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -31,14 +32,12 @@ class StraightLineGreenTest {
 
     private void mockCurrentLane(Direction currentDirection, TurnDirection currentTurn) {
         when(lanesGroup.getLane(currentDirection)).thenReturn(currentLane);
-        when(currentLane.getCarsCount()).thenReturn(1);
-        when(currentLane.nextCarTurnDirection()).thenReturn(currentTurn);
+        when(currentLane.nextCarTurnDirection()).thenReturn(Optional.ofNullable(currentTurn));
     }
 
     private void mockOppositeLane(Direction oppositeDirection, TurnDirection oppositeTurn) {
         when(lanesGroup.getLane(oppositeDirection)).thenReturn(oppositeLane);
-        when(oppositeLane.getCarsCount()).thenReturn(1);
-        when(oppositeLane.nextCarTurnDirection()).thenReturn(oppositeTurn);
+        when(oppositeLane.nextCarTurnDirection()).thenReturn(Optional.ofNullable(oppositeTurn));
     }
 
     @Nested
@@ -63,8 +62,7 @@ class StraightLineGreenTest {
         @Test
         void shouldReturnFalseWhenCurrentLaneNorthIsEmpty() {
             // given
-            when(lanesGroup.getLane(Direction.NORTH)).thenReturn(currentLane);
-            when(currentLane.getCarsCount()).thenReturn(0);
+            mockCurrentLane(Direction.NORTH, null);
 
             // when
             boolean result = lights.canMove(lanesGroup, Direction.NORTH);
@@ -76,8 +74,7 @@ class StraightLineGreenTest {
         @Test
         void shouldReturnFalseWhenCurrentLaneSouthIsEmpty() {
             // given
-            when(lanesGroup.getLane(Direction.SOUTH)).thenReturn(currentLane);
-            when(currentLane.getCarsCount()).thenReturn(0);
+            mockCurrentLane(Direction.SOUTH, null);
 
             // when
             boolean result = lights.canMove(lanesGroup, Direction.SOUTH);
@@ -173,8 +170,7 @@ class StraightLineGreenTest {
         @Test
         void shouldReturnFalseWhenCurrentLaneEastIsEmpty() {
             // given
-            when(lanesGroup.getLane(Direction.EAST)).thenReturn(currentLane);
-            when(currentLane.getCarsCount()).thenReturn(0);
+            mockCurrentLane(Direction.EAST, null);
 
             // when
             boolean result = lights.canMove(lanesGroup, Direction.EAST);
@@ -186,8 +182,7 @@ class StraightLineGreenTest {
         @Test
         void shouldReturnFalseWhenCurrentLaneWestIsEmpty() {
             // given
-            when(lanesGroup.getLane(Direction.WEST)).thenReturn(currentLane);
-            when(currentLane.getCarsCount()).thenReturn(0);
+            mockCurrentLane(Direction.WEST, null);
 
             // when
             boolean result = lights.canMove(lanesGroup, Direction.WEST);

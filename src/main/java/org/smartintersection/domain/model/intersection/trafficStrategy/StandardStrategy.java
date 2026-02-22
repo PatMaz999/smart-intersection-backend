@@ -9,6 +9,7 @@ import org.smartintersection.domain.model.intersection.lightsState.singleRoad.*;
 import org.smartintersection.domain.model.vehicle.TurnDirection;
 
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 
@@ -80,7 +81,8 @@ public class StandardStrategy implements TrafficStrategy {
         if (currentWaitingTime > warningWaitingTime) {
             Direction priorityDirection = lanes.getMaxPriorityDirection();
 
-            if (lanes.getLane(priorityDirection).nextCarTurnDirection() == TurnDirection.LEFT) {
+            Optional<TurnDirection> currentTurnDirection = lanes.getLane(priorityDirection).nextCarTurnDirection();
+            if (currentTurnDirection.isPresent() && currentTurnDirection.get() == TurnDirection.LEFT) {
                 Lane oppositeLane = lanes.getLane(priorityDirection.getOpposite());
                 int seriesOfCollidingCars = 0;
                 for (var x : oppositeLane.getQueue()) {
@@ -134,7 +136,8 @@ public class StandardStrategy implements TrafficStrategy {
     //    TODO: to remove
     private boolean requiresDedicatedLeftTurn(LanesGroup lanes) {
         for (Lane lane : lanes.getLanes().values()) {
-            if (lane.nextCarTurnDirection() != TurnDirection.LEFT)
+            var nextTurn = lane.nextCarTurnDirection();
+            if (nextTurn.isPresent() && nextTurn.get() != TurnDirection.LEFT)
                 continue;
             int steps = 0;
             int series = 0;

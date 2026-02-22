@@ -1,16 +1,15 @@
 package org.smartintersection.domain.model.intersection.lanes;
 
+import lombok.Getter;
 import org.smartintersection.domain.model.intersection.Direction;
 import org.smartintersection.domain.model.vehicle.TurnDirection;
 import org.smartintersection.domain.model.vehicle.Vehicle;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
 
 public class StandardLane implements Lane {
     private Queue<Vehicle> queue;
+    @Getter
     private final Direction direction;
 
     public StandardLane(Direction direction) {
@@ -34,11 +33,6 @@ public class StandardLane implements Lane {
     }
 
     @Override
-    public Direction getDirection() {
-        return direction;
-    }
-
-    @Override
     public int getPriority() {
         return queue.isEmpty() ? 0 : queue.peek().getPriority();
     }
@@ -50,8 +44,9 @@ public class StandardLane implements Lane {
     }
 
     @Override
-    public TurnDirection nextCarTurnDirection() {
-        return queue.isEmpty() ? null : queue.peek().getTurnDirection();
+    public Optional<TurnDirection> nextCarTurnDirection() {
+        return Optional.ofNullable(queue.peek())
+                .map(Vehicle::getTurnDirection);
     }
 
     @Override

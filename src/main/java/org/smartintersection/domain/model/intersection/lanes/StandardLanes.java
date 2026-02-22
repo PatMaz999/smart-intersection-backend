@@ -14,7 +14,6 @@ import java.util.Comparator;
 public class StandardLanes implements LanesGroup {
     Map<Direction, Lane> lanes;
 
-
     public StandardLanes() {
         this.lanes = Map.of(
                 Direction.NORTH, new StandardLane(Direction.NORTH),
@@ -48,6 +47,11 @@ public class StandardLanes implements LanesGroup {
                 .mapToInt(Lane::getPriority)
                 .max()
                 .orElse(0);
+    }
+
+    @Override
+    public void increasePriority(Direction direction) {
+        lanes.get(direction).incrementPriority();
     }
 
     @Override

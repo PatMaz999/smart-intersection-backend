@@ -34,7 +34,8 @@ public class StandardStrategy implements TrafficStrategy {
     public LightsState changeLightsState(LanesGroup lanes, LightsState currentState) {
         if (statesQueue.isEmpty())
             refillQueue(lanes, currentState);
-        return statesQueue.poll().state();
+        return statesQueue.peek().getTimeLeft() <= 1 ? statesQueue.poll().returnState() :
+                statesQueue.peek().returnState();
     }
 
     @Override
@@ -52,10 +53,10 @@ public class StandardStrategy implements TrafficStrategy {
 //        empty
         if (lanes.getTotalVehicles() == 0) {
             if (currentState.isOptimal()) {
-                extendCurrentPhase(currentState);
+                extendCurrentPhase(currentState, 1);
                 return;
             } else {
-                wrapWithClearancePhase(currentState, getInitialState(lanes));
+                wrapWithClearancePhase(currentState, getInitialState(lanes), 1);
                 return;
             }
         }
@@ -68,7 +69,9 @@ public class StandardStrategy implements TrafficStrategy {
         }
         if (carsOnGreen == 0) {
             Direction newDirection = greenDirections.iterator().next().getRight();
-            wrapWithClearancePhase(currentState, new StraightLineGreen(newDirection));
+            int waitingCars = Math.max(lanes.getLane(newDirection).getCarsCount(), lanes.getLane(newDirection.getOpposite()).getCarsCount());
+            int duration = Math.min(waitingCars, 8);
+            wrapWithClearancePhase(currentState, new StraightLineGreen(newDirection), duration);
             return;
         }
 
@@ -77,29 +80,33 @@ public class StandardStrategy implements TrafficStrategy {
         if (currentWaitingTime > warningWaitingTime) {
             Direction priorityDirection = lanes.getMaxPriorityDirection();
 
-            Lane oppositeLane = lanes.getLane(priorityDirection.getOpposite());
-            int seriesOfCollidingCars = 0;
-            for (var x : oppositeLane.getQueue()) {
-                if (x.getTurnDirection() != TurnDirection.LEFT)
-                    seriesOfCollidingCars++;
-                else
-                    break;
+            if (lanes.getLane(priorityDirection).nextCarTurnDirection() == TurnDirection.LEFT) {
+                Lane oppositeLane = lanes.getLane(priorityDirection.getOpposite());
+                int seriesOfCollidingCars = 0;
+                for (var x : oppositeLane.getQueue()) {
+                    if (x.getTurnDirection() != TurnDirection.LEFT)
+                        seriesOfCollidingCars++;
+                    else
+                        break;
+                }
+                int totalWaitingTime = currentWaitingTime + seriesOfCollidingCars;
+                if (totalWaitingTime >= maxWaitingTime) {
+                    swapToOneLine(currentState, priorityDirection);
+                    return;
+                }
+                if (greenDirections.contains(priorityDirection)) {
+                    extendCurrentPhase(currentState, totalWaitingTime);
+                    return;
+                }
             }
-            int totalWaitingTime = currentWaitingTime + seriesOfCollidingCars;
-
-            if (totalWaitingTime >= maxWaitingTime) {
-                swapToOneLine(currentState, priorityDirection);
+            else if(!greenDirections.contains(priorityDirection)) {
+                int duration = Math.min(lanes.getLane(priorityDirection).getCarsCount(), 8);
+                wrapWithClearancePhase(currentState, new StraightLineGreen(priorityDirection), duration);
                 return;
             }
-            if (greenDirections.contains(priorityDirection)) {
-                extendCurrentPhase(currentState);
-                return;
-            }
-            wrapWithClearancePhase(currentState, new StraightLineGreen(priorityDirection));
-            return;
         }
 
-        extendCurrentPhase(currentState);
+        extendCurrentPhase(currentState,1);
 //        return;
     }
 
@@ -108,13 +115,13 @@ public class StandardStrategy implements TrafficStrategy {
         statesQueue.add(new ScheduledState(new SingleLaneGreen(priorityDirection), 5));
     }
 
-    private void wrapWithClearancePhase(LightsState currentState, LightsState newState) {
+    private void wrapWithClearancePhase(LightsState currentState, LightsState newState, int duration) {
         statesQueue.add(new ScheduledState(new ClearancePhase(currentState), 1));
-        statesQueue.add(new ScheduledState(newState, 5));
+        statesQueue.add(new ScheduledState(newState, duration));
     }
 
-    private void extendCurrentPhase(LightsState currentState) {
-        statesQueue.add(new ScheduledState(currentState, 5));
+    private void extendCurrentPhase(LightsState currentState, int duration) {
+        statesQueue.add(new ScheduledState(currentState, duration));
     }
 
     //    TODO: to remove

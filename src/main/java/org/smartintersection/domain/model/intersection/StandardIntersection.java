@@ -29,14 +29,15 @@ public class StandardIntersection implements Intersection {
 
     @Override
     public List<Vehicle> proceed() {
-//        if(currentStrategy.shouldChangeLights())
-//            lightsState = currentStrategy.changeLightsState();
+
         lightsState = currentStrategy.changeLightsState(standardLanes, lightsState);
 
         Set<Direction> moveSet = new HashSet<>();
         for(Direction direction : Direction.values()){
             if(lightsState.canMove(standardLanes, direction))
                 moveSet.add(direction);
+            else
+                standardLanes.increasePriority(direction);
         }
         return standardLanes.passVehicles(moveSet);
     }

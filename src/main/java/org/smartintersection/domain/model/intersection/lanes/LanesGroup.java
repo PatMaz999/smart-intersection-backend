@@ -12,6 +12,7 @@ public interface LanesGroup {
     Lane getLane(Direction direction);
     List<Vehicle> passVehicles(Set<Direction> directions);
     int getMaxPriority();
+    void increasePriority(Direction directions);
     Direction getMaxPriorityDirection();
     int getTotalVehicles();
     void addVehicle(Vehicle vehicle, Direction direction);

@@ -91,7 +91,8 @@ public class StandardStrategy implements TrafficStrategy {
                 }
                 int totalWaitingTime = currentWaitingTime + seriesOfCollidingCars;
                 if (totalWaitingTime >= maxWaitingTime) {
-                    swapToOneLine(currentState, priorityDirection);
+                    int duration = Math.min(lanes.getLane(priorityDirection).getCarsCount(), 5);
+                    swapToOneLine(currentState, priorityDirection, duration);
                     return;
                 }
                 if (greenDirections.contains(priorityDirection)) {
@@ -110,9 +111,9 @@ public class StandardStrategy implements TrafficStrategy {
 //        return;
     }
 
-    private void swapToOneLine(LightsState currentState, Direction priorityDirection) {
+    private void swapToOneLine(LightsState currentState, Direction priorityDirection, int duration) {
         statesQueue.add(new ScheduledState(new ClearSingleLine(currentState, priorityDirection.getOpposite()), 1));
-        statesQueue.add(new ScheduledState(new SingleLaneGreen(priorityDirection), 5));
+        statesQueue.add(new ScheduledState(new SingleLaneGreen(priorityDirection), duration));
     }
 
     private void wrapWithClearancePhase(LightsState currentState, LightsState newState, int duration) {

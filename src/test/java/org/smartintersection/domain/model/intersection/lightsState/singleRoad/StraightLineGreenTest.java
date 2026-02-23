@@ -125,6 +125,12 @@ class StraightLineGreenTest {
             assertFalse(lights.canMove(lanesGroup, Direction.NORTH));
         }
 
+        @Test void northCanGoLeftWhenSouthIsEmpty() {
+            mockCurrentLane(Direction.NORTH, TurnDirection.LEFT);
+            mockOppositeLane(Direction.SOUTH, null);
+            assertTrue(lights.canMove(lanesGroup, Direction.NORTH));
+        }
+
         @Test void northCanGoStraight() {
             mockCurrentLane(Direction.NORTH, TurnDirection.STRAIGHT);
             assertTrue(lights.canMove(lanesGroup, Direction.NORTH));
@@ -151,6 +157,12 @@ class StraightLineGreenTest {
             mockCurrentLane(Direction.SOUTH, TurnDirection.LEFT);
             mockOppositeLane(Direction.NORTH, TurnDirection.RIGHT);
             assertFalse(lights.canMove(lanesGroup, Direction.SOUTH));
+        }
+
+        @Test void southCantGoLeftWhenNorthIsNull() {
+            mockCurrentLane(Direction.SOUTH, TurnDirection.LEFT);
+            mockOppositeLane(Direction.NORTH, null);
+            assertTrue(lights.canMove(lanesGroup, Direction.SOUTH));
         }
 
         @Test void southCanGoStraight() {
@@ -241,6 +253,12 @@ class StraightLineGreenTest {
             assertFalse(lights.canMove(lanesGroup, Direction.EAST));
         }
 
+        @Test void eastCanGoLeftWhenWestIsNull() {
+            mockCurrentLane(Direction.EAST, TurnDirection.LEFT);
+            mockOppositeLane(Direction.WEST, null);
+            assertTrue(lights.canMove(lanesGroup, Direction.EAST));
+        }
+
         @Test void eastCanGoStraight() {
             mockCurrentLane(Direction.EAST, TurnDirection.STRAIGHT);
             assertTrue(lights.canMove(lanesGroup, Direction.EAST));
@@ -267,6 +285,12 @@ class StraightLineGreenTest {
             mockCurrentLane(Direction.WEST, TurnDirection.LEFT);
             mockOppositeLane(Direction.EAST, TurnDirection.RIGHT);
             assertFalse(lights.canMove(lanesGroup, Direction.WEST));
+        }
+
+        @Test void westCantGoLeftWhenEastIsNull() {
+            mockCurrentLane(Direction.WEST, TurnDirection.LEFT);
+            mockOppositeLane(Direction.EAST, null);
+            assertTrue(lights.canMove(lanesGroup, Direction.WEST));
         }
 
         @Test void westCanGoStraight() {

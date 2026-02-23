@@ -112,12 +112,24 @@ class ClearSingleLaneTest {
     }
 
     @Test
-    void canMoveShouldAlwaysReturnFalse() {
+    void shouldNotMoveWhenLightWasChanged() {
         // given
-        when(previousState.getLightColors()).thenReturn(Map.of(Direction.NORTH, LightColor.GREEN));
+        when(previousState.getLightColors()).thenReturn(Map.of(Direction.NORTH, LightColor.GREEN, Direction.SOUTH, LightColor.GREEN));
         ClearSingleLane state = new ClearSingleLane(previousState, Direction.NORTH);
 
         // then
         assertFalse(state.canMove(null, Direction.NORTH));
+    }
+
+    @Test
+    void shouldMoveWhenLightWasNotChanged() {
+//        TODO:
+        // given
+        when(previousState.getLightColors()).thenReturn(Map.of(Direction.NORTH, LightColor.GREEN, Direction.SOUTH, LightColor.GREEN));
+
+        ClearSingleLane state = new ClearSingleLane(previousState, Direction.NORTH);
+
+        // then
+        assertTrue(state.canMove(null, Direction.SOUTH));
     }
 }

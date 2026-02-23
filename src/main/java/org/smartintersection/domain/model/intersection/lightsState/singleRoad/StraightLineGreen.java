@@ -57,6 +57,6 @@ public class StraightLineGreen extends AbstractLightsState {
 
         Lane oppositeLane = lanes.getLane(direction.getOpposite());
         Optional<TurnDirection> oppositeTurnDirection = oppositeLane.nextCarTurnDirection();
-        return oppositeTurnDirection.isPresent() && oppositeTurnDirection.get() == TurnDirection.LEFT;
+        return oppositeTurnDirection.isEmpty() || oppositeTurnDirection.get() == TurnDirection.LEFT;
     }
 }

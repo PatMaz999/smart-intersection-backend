@@ -6,7 +6,9 @@ import org.smartintersection.domain.model.intersection.lanes.LanesGroup;
 import org.smartintersection.domain.model.intersection.lightsState.LightColor;
 import org.smartintersection.domain.model.intersection.lightsState.LightsState;
 import org.smartintersection.domain.model.intersection.lightsState.singleRoad.ClearSingleLane;
+import org.smartintersection.domain.model.intersection.lightsState.singleRoad.ClearancePhase;
 import org.smartintersection.domain.model.intersection.lightsState.singleRoad.SingleLaneGreen;
+import org.smartintersection.domain.model.intersection.lightsState.singleRoad.StraightLineGreen;
 import org.smartintersection.domain.model.intersection.trafficStrategy.chainStrategy.AbstractTrafficHandler;
 import org.smartintersection.domain.model.intersection.trafficStrategy.chainStrategy.EmptyGreenHandler;
 import org.smartintersection.domain.model.intersection.trafficStrategy.chainStrategy.EmptyRoadHandler;
@@ -48,16 +50,16 @@ public class StandardStrategy implements TrafficStrategy {
         LightsState nextState = nextScheduledState.getState();
 
         if(!nextState.equals(currentState))
-            statesQueue.add(findClearancePhase(nextState));
+            statesQueue.add(findClearancePhase(currentState, nextState));
         statesQueue.add(nextScheduledState);
     }
 
-    private ScheduledState findClearancePhase(LightsState lightsState) {
-//        if (lightsState instanceof SingleLaneGreen) {
-//            Direction currentGreenDirection = lightsState.getByColor(LightColor.GREEN).iterator().next();
-//            return new ScheduledState(new ClearSingleLane(lightsState, currentGreenDirection.getOpposite()), 1);
-//        }
-        return new ScheduledState(lightsState, 1);
+    private ScheduledState findClearancePhase(LightsState currentLightState, LightsState newLightState) {
+        if (newLightState instanceof SingleLaneGreen && currentLightState instanceof StraightLineGreen && currentLightState.getLightColors().containsKey(newLightState.getByColor(LightColor.GREEN).iterator().next())) {
+            Direction newGreenDirection = newLightState.getByColor(LightColor.GREEN).iterator().next();
+            return new ScheduledState(new ClearSingleLane(currentLightState, newGreenDirection.getOpposite()), 1);
+        }
+        return new ScheduledState(new ClearancePhase(newLightState), 1);
     }
 
 

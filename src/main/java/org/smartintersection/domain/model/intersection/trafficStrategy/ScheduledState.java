@@ -5,6 +5,7 @@ import org.smartintersection.domain.model.intersection.lightsState.LightsState;
 
 public class ScheduledState{
 
+    @Getter
     private LightsState state;
     @Getter
     private int timeLeft;

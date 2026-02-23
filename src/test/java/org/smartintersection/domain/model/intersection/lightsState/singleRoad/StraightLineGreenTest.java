@@ -9,11 +9,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.smartintersection.domain.model.intersection.Direction;
 import org.smartintersection.domain.model.intersection.lanes.Lane;
 import org.smartintersection.domain.model.intersection.lanes.LanesGroup;
+import org.smartintersection.domain.model.intersection.lightsState.AbstractLightsState;
 import org.smartintersection.domain.model.intersection.lightsState.LightColor;
+import org.smartintersection.domain.model.intersection.lightsState.LightsState;
 import org.smartintersection.domain.model.vehicle.TurnDirection;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
@@ -40,6 +44,18 @@ class StraightLineGreenTest {
         when(oppositeLane.nextCarTurnDirection()).thenReturn(Optional.ofNullable(oppositeTurn));
     }
 
+    private List<AbstractLightsState> getAllStatesExcept(AbstractLightsState exceptState){
+        return Stream.of(
+                new StraightLineGreen(Direction.NORTH),
+                new StraightLineGreen(Direction.WEST),
+                new SingleLaneGreen(Direction.NORTH),
+                new SingleLaneGreen(Direction.SOUTH),
+                new SingleLaneGreen(Direction.EAST),
+                new SingleLaneGreen(Direction.WEST)
+        ).filter(state -> !state.equals(exceptState))
+                .toList();
+    }
+
     @Nested
     @DisplayName("North-South green")
     class NorthSouthGreen {
@@ -57,6 +73,14 @@ class StraightLineGreenTest {
                     () -> assertEquals(LightColor.RED, colors.get(Direction.EAST)),
                     () -> assertEquals(LightColor.RED, colors.get(Direction.WEST))
             );
+        }
+
+        @Test
+        void ShouldNotEqualDifferentStateForVerticalLine(){
+//            given
+            List<AbstractLightsState> differentStates = getAllStatesExcept(lights);
+//            when
+            differentStates.forEach(state -> assertNotEquals(state, lights));
         }
 
         @Test
@@ -165,6 +189,14 @@ class StraightLineGreenTest {
                     () -> assertEquals(LightColor.GREEN, colors.get(Direction.EAST)),
                     () -> assertEquals(LightColor.GREEN, colors.get(Direction.WEST))
             );
+        }
+
+        @Test
+        void ShouldNotEqualDifferentStateForHorizontalLine(){
+//            given
+            List<AbstractLightsState> differentStates = getAllStatesExcept(lights);
+//            when
+            differentStates.forEach(state -> assertNotEquals(state, lights));
         }
 
         @Test

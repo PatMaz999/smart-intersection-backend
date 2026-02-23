@@ -47,4 +47,18 @@ public abstract class AbstractLightsState implements LightsState {
                 .filter(l -> l == LightColor.GREEN)
                 .count() > 1;
     }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (!(o instanceof AbstractLightsState that)) return false;
+
+        return this.getColors().equals(that.getColors());
+    }
+
+    @Override
+    public int hashCode() {
+        return getColors().hashCode();
+    }
 }

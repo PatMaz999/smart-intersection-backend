@@ -5,30 +5,29 @@ import org.smartintersection.domain.model.intersection.lanes.Lane;
 import org.smartintersection.domain.model.intersection.lanes.LanesGroup;
 import org.smartintersection.domain.model.intersection.lightsState.LightColor;
 import org.smartintersection.domain.model.intersection.lightsState.LightsState;
-import org.smartintersection.domain.model.intersection.lightsState.singleRoad.*;
+import org.smartintersection.domain.model.intersection.lightsState.singleRoad.ClearSingleLane;
+import org.smartintersection.domain.model.intersection.lightsState.singleRoad.SingleLaneGreen;
+import org.smartintersection.domain.model.intersection.trafficStrategy.chainStrategy.AbstractTrafficHandler;
+import org.smartintersection.domain.model.intersection.trafficStrategy.chainStrategy.EmptyGreenHandler;
+import org.smartintersection.domain.model.intersection.trafficStrategy.chainStrategy.EmptyRoadHandler;
+import org.smartintersection.domain.model.intersection.trafficStrategy.chainStrategy.PriorityHandler;
 import org.smartintersection.domain.model.vehicle.TurnDirection;
 
 import java.util.LinkedList;
-import java.util.Optional;
 import java.util.Queue;
-import java.util.Set;
 
 public class StandardStrategy implements TrafficStrategy {
 
     private Queue<ScheduledState> statesQueue;
-    private int warningWaitingTime;
-    private int maxWaitingTime;
+    private AbstractTrafficHandler trafficHandler;
 
     public StandardStrategy() {
         this.statesQueue = new LinkedList<>();
-        this.warningWaitingTime = 12;
-        this.maxWaitingTime = 16;
-    }
+        trafficHandler = new EmptyRoadHandler();
 
-    public StandardStrategy(int warningWaitingTime, int maxWaitingTime) {
-        this.statesQueue = new LinkedList<>();
-        this.warningWaitingTime = warningWaitingTime;
-        this.maxWaitingTime = maxWaitingTime;
+        trafficHandler
+                .setNext(new EmptyGreenHandler())
+                .setNext(new PriorityHandler());
     }
 
     @Override
@@ -41,97 +40,40 @@ public class StandardStrategy implements TrafficStrategy {
 
     @Override
     public LightsState getInitialState(LanesGroup lanes) {
-        int verticalCarSum = lanes.getLane(Direction.NORTH).getCarsCount() +
-                lanes.getLane(Direction.SOUTH).getCarsCount();
-        int horizontalCarSum = lanes.getLane(Direction.WEST).getCarsCount() +
-                lanes.getLane(Direction.EAST).getCarsCount();
-        return verticalCarSum >= horizontalCarSum ?
-                new StraightLineGreen(Direction.NORTH) :
-                new StraightLineGreen(Direction.WEST);
+        return EmptyRoadHandler.getInitialState(lanes);
     }
 
-    public void refillQueue(LanesGroup lanes, LightsState currentState) {
-//        empty
-        if (lanes.getTotalVehicles() == 0) {
-            if (currentState.isOptimal()) {
-                extendCurrentPhase(currentState, 1);
-                return;
-            } else {
-                wrapWithClearancePhase(currentState, getInitialState(lanes), 1);
-                return;
-            }
-        }
+    private void refillQueue(LanesGroup lanes, LightsState currentState) {
+        ScheduledState nextScheduledState = trafficHandler.handle(lanes, currentState);
+        LightsState nextState = nextScheduledState.getState();
 
-//        only green empty
-        Set<Direction> greenDirections = currentState.getByColor(LightColor.GREEN);
-        int carsOnGreen = 0;
-        for (Direction direction : greenDirections) {
-            carsOnGreen += lanes.getLane(direction).getCarsCount();
-        }
-        if (carsOnGreen == 0) {
-            Direction newDirection = greenDirections.iterator().next().getRight();
-            int waitingCars = Math.max(lanes.getLane(newDirection).getCarsCount(), lanes.getLane(newDirection.getOpposite()).getCarsCount());
-            int duration = Math.min(waitingCars, 8);
-            wrapWithClearancePhase(currentState, new StraightLineGreen(newDirection), duration);
-            return;
-        }
-
-//        too long waiting time
-        int currentWaitingTime = lanes.getMaxPriority();
-        if (currentWaitingTime > warningWaitingTime) {
-            Direction priorityDirection = lanes.getMaxPriorityDirection();
-
-            Optional<TurnDirection> currentTurnDirection = lanes.getLane(priorityDirection).nextCarTurnDirection();
-            if (currentTurnDirection.isPresent() && currentTurnDirection.get() == TurnDirection.LEFT) {
-                Lane oppositeLane = lanes.getLane(priorityDirection.getOpposite());
-                int seriesOfCollidingCars = 0;
-                for (var x : oppositeLane.getQueue()) {
-                    if (x.getTurnDirection() != TurnDirection.LEFT)
-                        seriesOfCollidingCars++;
-                    else
-                        break;
-                }
-                int totalWaitingTime = currentWaitingTime + seriesOfCollidingCars;
-                if (totalWaitingTime >= maxWaitingTime) {
-                    if(greenDirections.contains(priorityDirection)) {
-                        int duration = Math.min(lanes.getLane(priorityDirection).getCarsCount(), 5);
-                        swapToOneLine(currentState, priorityDirection, duration);
-                    }
-                    else{
-                        int duration = Math.min(lanes.getLane(priorityDirection).getCarsCount(), 12);
-                        wrapWithClearancePhase(currentState, new SingleLaneGreen(priorityDirection), duration);
-                    }
-                    return;
-                }
-                if (greenDirections.contains(priorityDirection)) {
-                    extendCurrentPhase(currentState, totalWaitingTime);
-                    return;
-                }
-            }
-            else if(!greenDirections.contains(priorityDirection)) {
-                int duration = Math.min(lanes.getLane(priorityDirection).getCarsCount(), 8);
-                wrapWithClearancePhase(currentState, new StraightLineGreen(priorityDirection), duration);
-                return;
-            }
-        }
-
-        extendCurrentPhase(currentState,1);
-//        return;
+        if(!nextState.equals(currentState))
+            statesQueue.add(findClearancePhase(nextState));
+        statesQueue.add(nextScheduledState);
     }
 
-    private void swapToOneLine(LightsState currentState, Direction priorityDirection, int duration) {
-        statesQueue.add(new ScheduledState(new ClearSingleLane(currentState, priorityDirection.getOpposite()), 1));
-        statesQueue.add(new ScheduledState(new SingleLaneGreen(priorityDirection), duration));
+    private ScheduledState findClearancePhase(LightsState lightsState) {
+//        if (lightsState instanceof SingleLaneGreen) {
+//            Direction currentGreenDirection = lightsState.getByColor(LightColor.GREEN).iterator().next();
+//            return new ScheduledState(new ClearSingleLane(lightsState, currentGreenDirection.getOpposite()), 1);
+//        }
+        return new ScheduledState(lightsState, 1);
     }
 
-    private void wrapWithClearancePhase(LightsState currentState, LightsState newState, int duration) {
-        statesQueue.add(new ScheduledState(new ClearancePhase(currentState), 1));
-        statesQueue.add(new ScheduledState(newState, duration));
-    }
 
-    private void extendCurrentPhase(LightsState currentState, int duration) {
-        statesQueue.add(new ScheduledState(currentState, duration));
-    }
+//    private void swapToOneLine(LightsState currentState, Direction priorityDirection, int duration) {
+//        statesQueue.add(new ScheduledState(new ClearSingleLane(currentState, priorityDirection.getOpposite()), 1));
+//        statesQueue.add(new ScheduledState(new SingleLaneGreen(priorityDirection), duration));
+//    }
+//
+//    private void wrapWithClearancePhase(LightsState currentState, LightsState newState, int duration) {
+//        statesQueue.add(new ScheduledState(new ClearancePhase(currentState), 1));
+//        statesQueue.add(new ScheduledState(newState, duration));
+//    }
+//
+//    private void extendCurrentPhase(LightsState currentState, int duration) {
+//        statesQueue.add(new ScheduledState(currentState, duration));
+//    }
 
     //    TODO: to remove
     private boolean requiresDedicatedLeftTurn(LanesGroup lanes) {

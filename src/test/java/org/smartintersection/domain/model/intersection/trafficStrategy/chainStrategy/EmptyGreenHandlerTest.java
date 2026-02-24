@@ -22,8 +22,6 @@ import static org.smartintersection.domain.model.intersection.trafficStrategy.ch
 @ExtendWith(MockitoExtension.class)
 class EmptyGreenHandlerTest {
 
-    private static final int DEFAULT_DURATION = 8;
-
     @Mock
     private LanesGroup lanes;
 

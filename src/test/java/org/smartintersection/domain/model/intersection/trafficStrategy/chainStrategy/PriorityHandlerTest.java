@@ -42,8 +42,6 @@ class PriorityHandlerTest {
 
     @Mock
     private Vehicle collidingCar1;
-    @Mock
-    private Vehicle collidingCar2;
 
     @InjectMocks
     private PriorityHandler handler = new PriorityHandler(WARNING_WAITING_TIME, MAX_WAITING_TIME);

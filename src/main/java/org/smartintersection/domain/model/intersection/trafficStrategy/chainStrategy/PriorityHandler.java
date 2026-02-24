@@ -32,44 +32,54 @@ public class PriorityHandler extends AbstractTrafficHandler {
         Set<Direction> greenDirections = currentState.getByColor(LightColor.GREEN);
         int currentWaitingTime = lanes.getMaxPriority();
 
-        if (currentWaitingTime > warningWaitingTime) {
-            Direction priorityDirection = lanes.getMaxPriorityDirection();
-            Optional<TurnDirection> currentTurnDirection = lanes.getLane(priorityDirection).nextCarTurnDirection();
+        if (currentWaitingTime < warningWaitingTime) {
+            return handleNext(lanes, currentState);
+        }
 
-            if (currentTurnDirection.isPresent() && currentTurnDirection.get() == TurnDirection.LEFT) {
-                Lane oppositeLane = lanes.getLane(priorityDirection.getOpposite());
-                int seriesOfCollidingCars = 0;
+        Direction priorityDirection = lanes.getMaxPriorityDirection();
+        Optional<TurnDirection> currentTurnDirection = lanes.getLane(priorityDirection).nextCarTurnDirection();
 
-                for (var car : oppositeLane.getQueue()) {
-                    if (car.getTurnDirection() != TurnDirection.LEFT) {
-                        seriesOfCollidingCars++;
-                    } else {
-                        break;
-                    }
-                }
+        if (currentTurnDirection.isEmpty()) {
+            return handleNext(lanes, currentState);
+        }
 
-                int totalWaitingTime = currentWaitingTime + seriesOfCollidingCars;
+        Lane oppositeLane = lanes.getLane(priorityDirection.getOpposite());
+        int seriesOfCollidingCars = calculateSeriesOfCollidingCars(oppositeLane);
+        int totalWaitingTime = currentWaitingTime + seriesOfCollidingCars;
 
-                if (totalWaitingTime >= maxWaitingTime) {
-                    int duration = calculateAllowedCars(lanes, priorityDirection);
-                    if (greenDirections.contains(priorityDirection)) {
-                        return wrapSingleLane(priorityDirection, duration);
-                    } else {
-                        return wrapLine(currentState, duration);
-                    }
-                }
+        boolean isCurrentLeftTurn = currentTurnDirection.get() == TurnDirection.LEFT;
+        if (!greenDirections.contains(priorityDirection)) {
 
-                if (greenDirections.contains(priorityDirection)) {
-                    int duration = Math.min(seriesOfCollidingCars + 1, DEFAULT_CARS_PER_PHASE);
-                    return wrapLine(currentState, duration);
-                }
-
-            } else if (!greenDirections.contains(priorityDirection)) {
+            if (isCurrentLeftTurn && totalWaitingTime >= maxWaitingTime) {
+                int duration = calculateAllowedCars(lanes, priorityDirection);
+                return wrapSingleLane(priorityDirection, duration);
+            } else {
                 int duration = calculateAllowedCars(lanes, priorityDirection, priorityDirection.getOpposite());
                 return wrapLine(new StraightLineGreen(priorityDirection), duration);
             }
         }
 
+        if (isCurrentLeftTurn) {
+            if (totalWaitingTime >= maxWaitingTime) {
+                int duration = calculateAllowedCars(lanes, priorityDirection);
+                return wrapSingleLane(priorityDirection, duration);
+            }
+
+            int duration = Math.min(seriesOfCollidingCars + 1, DEFAULT_CARS_PER_PHASE);
+            return wrapLine(currentState, duration);
+        }
+
         return handleNext(lanes, currentState);
+    }
+
+    private static int calculateSeriesOfCollidingCars(Lane oppositeLane) {
+        int seriesOfCollidingCars = 0;
+        for (var car : oppositeLane.getQueue()) {
+            if (car.getTurnDirection() != TurnDirection.LEFT)
+                seriesOfCollidingCars++;
+            else
+                break;
+        }
+        return seriesOfCollidingCars;
     }
 }

@@ -5,12 +5,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.smartintersection.domain.model.intersection.Direction;
+import org.smartintersection.domain.model.intersection.lanes.Lane;
+import org.smartintersection.domain.model.intersection.lanes.LanesGroup;
 import org.smartintersection.domain.model.intersection.lightsState.LightColor;
 import org.smartintersection.domain.model.intersection.lightsState.LightsState;
+import org.smartintersection.domain.model.vehicle.TurnDirection;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -20,7 +25,7 @@ class ClearSingleLaneTest {
     private LightsState previousState;
 
     @Test
-     void shouldClearNorthWhenNorthAndSouthAreGreen() {
+    void shouldClearNorthWhenNorthAndSouthAreGreen() {
         // given
         when(previousState.getLightColors()).thenReturn(Map.of(
                 Direction.NORTH, LightColor.GREEN,
@@ -122,14 +127,38 @@ class ClearSingleLaneTest {
     }
 
     @Test
-    void shouldMoveWhenLightWasNotChanged() {
-//        TODO:
+    void shouldNotMoveWhenLeftWhenOppositeLightIsYellow() {
         // given
+        LanesGroup lanesGroup = mock(LanesGroup.class);
+        Lane currentLane = mock(Lane.class);
+        Lane oppositeLane = mock(Lane.class);
+
         when(previousState.getLightColors()).thenReturn(Map.of(Direction.NORTH, LightColor.GREEN, Direction.SOUTH, LightColor.GREEN));
+        when(lanesGroup.getLane(Direction.SOUTH)).thenReturn(currentLane);
+        when(currentLane.nextCarTurnDirection()).thenReturn(Optional.of(TurnDirection.LEFT));
+
+        when(lanesGroup.getLane(Direction.NORTH)).thenReturn(oppositeLane);
+        when(oppositeLane.nextCarTurnDirection()).thenReturn(Optional.of(TurnDirection.RIGHT));
 
         ClearSingleLane state = new ClearSingleLane(previousState, Direction.NORTH);
 
         // then
-        assertTrue(state.canMove(null, Direction.SOUTH));
+        assertFalse(state.canMove(lanesGroup, Direction.SOUTH));
+    }
+
+    @Test
+    void shouldMoveWhenLightWasNotChanged() {
+        // given
+        LanesGroup lanesGroup = mock(LanesGroup.class);
+        Lane currentLane = mock(Lane.class);
+
+        when(previousState.getLightColors()).thenReturn(Map.of(Direction.NORTH, LightColor.GREEN, Direction.SOUTH, LightColor.GREEN));
+        when(lanesGroup.getLane(Direction.SOUTH)).thenReturn(currentLane);
+        when(currentLane.nextCarTurnDirection()).thenReturn(Optional.of(TurnDirection.STRAIGHT));
+
+        ClearSingleLane state = new ClearSingleLane(previousState, Direction.NORTH);
+
+        // then
+        assertTrue(state.canMove(lanesGroup, Direction.SOUTH));
     }
 }

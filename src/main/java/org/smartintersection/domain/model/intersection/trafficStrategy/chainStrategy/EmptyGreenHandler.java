@@ -20,8 +20,7 @@ public class EmptyGreenHandler extends AbstractTrafficHandler {
         }
         if (carsOnGreen == 0) {
             Direction newDirection = greenDirections.iterator().next().getRight();
-            int waitingCars = Math.max(lanes.getLane(newDirection).getCarsCount(), lanes.getLane(newDirection.getOpposite()).getCarsCount());
-            int duration = Math.min(waitingCars, 8);
+            int duration = calculateAllowedCars(lanes, newDirection, newDirection.getOpposite());
             return wrapLine(new StraightLineGreen(newDirection), duration);
         }
         return handleNext(lanes, currentState);

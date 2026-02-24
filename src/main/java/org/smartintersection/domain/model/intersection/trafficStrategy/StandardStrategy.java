@@ -40,7 +40,13 @@ public class StandardStrategy implements TrafficStrategy {
 
     @Override
     public LightsState getInitialState(LanesGroup lanes) {
-        return EmptyRoadHandler.getInitialState(lanes);
+        int verticalCarSum = lanes.getLane(Direction.NORTH).getCarsCount() +
+                lanes.getLane(Direction.SOUTH).getCarsCount();
+        int horizontalCarSum = lanes.getLane(Direction.WEST).getCarsCount() +
+                lanes.getLane(Direction.EAST).getCarsCount();
+        return verticalCarSum >= horizontalCarSum ?
+                new StraightLineGreen(Direction.NORTH) :
+                new StraightLineGreen(Direction.WEST);
     }
 
     private void refillQueue(LanesGroup lanes, LightsState currentState) {

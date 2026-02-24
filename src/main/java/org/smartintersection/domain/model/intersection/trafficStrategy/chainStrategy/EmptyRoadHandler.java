@@ -16,17 +16,11 @@ public class EmptyRoadHandler extends AbstractTrafficHandler {
         if (currentState.isOptimal()) {
             return new ScheduledState(currentState, 1);
         } else {
-            return wrapLine(getInitialState(lanes),1);
+            return wrapLine(getInitialState(Direction.NORTH),1);
         }
     }
 
-    public static LightsState getInitialState(LanesGroup lanes) {
-        int verticalCarSum = lanes.getLane(Direction.NORTH).getCarsCount() +
-                lanes.getLane(Direction.SOUTH).getCarsCount();
-        int horizontalCarSum = lanes.getLane(Direction.WEST).getCarsCount() +
-                lanes.getLane(Direction.EAST).getCarsCount();
-        return verticalCarSum >= horizontalCarSum ?
-                new StraightLineGreen(Direction.NORTH) :
-                new StraightLineGreen(Direction.WEST);
+    private LightsState getInitialState(Direction direction) {
+        return new StraightLineGreen(direction);
     }
 }

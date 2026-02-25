@@ -9,7 +9,6 @@
 
         .panel { margin-top: 60px; display: flex; flex-direction: column; align-items: center; }
 
-        /* Skrzyżowanie zrobione jako siatka 3x3 */
         .intersection-wrapper { display: grid; grid-template-columns: 160px 160px 160px; grid-template-rows: 160px 160px 160px; gap: 10px; margin-top: 20px; }
 
         .road { background-color: #34495e; border: 2px dashed #7f8c8d; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 10px; border-radius: 8px; font-weight: bold;}
@@ -19,7 +18,6 @@
         .center { background-color: #7f8c8d; border: 2px solid #bdc3c7; display: flex; align-items: center; justify-content: center; text-align: center; flex-direction: column;}
         .empty { background: transparent; border: none; }
 
-        /* Konkretne pozycje na siatce */
         #north { grid-column: 2; grid-row: 1; border-bottom: none; border-bottom-left-radius: 0; border-bottom-right-radius: 0; justify-content: flex-end;}
         #west  { grid-column: 1; grid-row: 2; border-right: none; border-top-right-radius: 0; border-bottom-right-radius: 0; justify-content: center;}
         #east  { grid-column: 3; grid-row: 2; border-left: none; border-top-left-radius: 0; border-bottom-left-radius: 0; justify-content: center;}
@@ -149,7 +147,7 @@
 
 <script>
     window.onload = function() {
-        alert("⚠️ UWAGA: Poniższa wizualizacja została przygotowana wyłącznie do celów demonstracyjnych. Kod frontendu nie jest przeznaczony do wdrożenia na środowisku produkcyjnym!");
+        alert("⚠️ UWAGA: Poniższa wizualizacja została przygotowana wyłącznie do celów demonstracyjnych. Kod frontendu nie został wykonany sposób spełniający wymagania współczesnych systemów oraz nie nadaje się do wdrożenia!");
     };
 
     let activeTimeoutId = null;

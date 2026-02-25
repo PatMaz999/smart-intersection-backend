@@ -147,6 +147,8 @@ Priorytetem podczas tworzenia systemu było zapewnienie **maksymalnej rozszerzal
 
 ### Możliwości rozwoju
 
+* **Łączenie skrzyżowań:** Architektura systemu pozwala na tworzenie wielu niezależnych skrzyżowań. Wprowadzenie mechanizmu przekazywania pojazdów opuszczających jedno skrzyżowanie na wlot innego umożliwiłoby budowę złożonych sieci drogowych, a nawet symulację ruchu w skali całego miasta. Realizacja tego rozszerzenia wymagałaby jedynie dodania logiki orkiestracji w `SimulationService` lub dedykowanym serwisie warstwy aplikacji.
+
 * **Różne priorytety pojazdów:** System umożliwia dodanie pojazdów z wyższym lub niższym priorytetem przejazdu. Nowy typ musi implementować interfejs `Vehicle`. Nowy typ może posiadać inny priorytet zwracany metodą `getPriority()` oraz posiadać inną logikę zwiększania priorytetu podczas oczekiwania `incrementPriority()`.
 
 * **Różne konfiguracje pasów dojazdowych:** Nowa konfiguracja powinna implementować interfejs `LanesGroup`. Wystarczy zmienić sposób tworzenia nowych klas implementujących interfejs `Lane`. Można w ten sposób utworzyć konfiguracje skrzyżowania z trzema drogami dojazdowymi.

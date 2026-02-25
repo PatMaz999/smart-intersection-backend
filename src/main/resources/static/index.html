@@ -29,6 +29,9 @@
         .controls { background: #34495e; padding: 20px; border-radius: 8px; text-align: center; display: flex; flex-direction: column; align-items: center;}
         textarea { width: 350px; height: 250px; background: #1e272e; color: #f1c40f; font-family: monospace; border: 1px solid #7f8c8d; padding: 10px; border-radius: 4px; resize: none;}
 
+        .speed-control { display: flex; align-items: center; gap: 10px; margin-top: 15px; width: 100%; justify-content: space-between; background: #2c3e50; padding: 8px 12px; border-radius: 4px; box-sizing: border-box;}
+        .speed-control select { padding: 5px; border-radius: 4px; background: #ecf0f1; border: none; font-weight: bold; cursor: pointer;}
+
         .button-group { display: flex; gap: 10px; width: 100%; margin-top: 15px; }
         button { flex: 1; color: white; border: none; padding: 12px 10px; font-size: 15px; cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.3s;}
 
@@ -53,27 +56,27 @@
     <div class="intersection-wrapper">
         <div class="empty"></div>
         <div id="north" class="road">
-            <div class="road-stats" id="north-stats">Aut: 0<br>Nast: -</div>
+            <div class="road-stats" id="north-stats">Kolejka: 0<br>Nast: -</div>
             <div class="road-title">PÓŁNOC</div>
         </div>
         <div class="empty"></div>
 
         <div id="west" class="road">
             <div class="road-title">ZACHÓD</div>
-            <div class="road-stats" id="west-stats">Aut: 0<br>Nast: -</div>
+            <div class="road-stats" id="west-stats">Kolejka: 0<br>Nast: -</div>
         </div>
         <div id="center" class="center">
             <span style="color:#2c3e50; font-size: 12px;">Skrzyżowanie</span>
         </div>
         <div id="east" class="road">
             <div class="road-title">WSCHÓD</div>
-            <div class="road-stats" id="east-stats">Aut: 0<br>Nast: -</div>
+            <div class="road-stats" id="east-stats">Kolejka: 0<br>Nast: -</div>
         </div>
 
         <div class="empty"></div>
         <div id="south" class="road">
             <div class="road-title">POŁUDNIE</div>
-            <div class="road-stats" id="south-stats">Aut: 0<br>Nast: -</div>
+            <div class="road-stats" id="south-stats">Kolejka: 0<br>Nast: -</div>
         </div>
         <div class="empty"></div>
     </div>
@@ -84,18 +87,57 @@
     <textarea id="jsonInput">
 {
   "commands": [
-    { "type": "addVehicle", "vehicleId": "V1", "startRoad": "south", "endRoad": "north" },
-    { "type": "addVehicle", "vehicleId": "V2", "startRoad": "north", "endRoad": "south" },
-    { "type": "step" },
-    { "type": "step" },
-    { "type": "addVehicle", "vehicleId": "V3", "startRoad": "west", "endRoad": "south" },
-    { "type": "addVehicle", "vehicleId": "V4", "startRoad": "west", "endRoad": "north" },
-    { "type": "step" },
-    { "type": "step" },
-    { "type": "step" }
+    {
+      "type": "addVehicle",
+      "vehicleId": "V1",
+      "startRoad": "south",
+      "endRoad": "north"
+    },
+    {
+      "type": "addVehicle",
+      "vehicleId": "V2",
+      "startRoad": "north",
+      "endRoad": "south"
+    },
+    {
+      "type": "step"
+    },
+    {
+      "type": "step"
+    },
+    {
+      "type": "addVehicle",
+      "vehicleId": "V3",
+      "startRoad": "west",
+      "endRoad": "south"
+    },
+    {
+      "type": "addVehicle",
+      "vehicleId": "V4",
+      "startRoad": "west",
+      "endRoad": "south"
+    },
+    {
+      "type": "step"
+    },
+    {
+      "type": "step"
+    },
+    {
+      "type": "step"
+    }
   ]
 }
         </textarea>
+
+    <div class="speed-control">
+        <label for="speedSelect">Prędkość symulacji:</label>
+        <select id="speedSelect">
+            <option value="1200">x1 (Normalna)</option>
+            <option value="600">x2 (Szybka)</option>
+            <option value="300">x4 (Bardzo szybka)</option>
+        </select>
+    </div>
 
     <div class="button-group">
         <button id="runBtn" class="btn-start" onclick="startSimulation()">Rozpocznij Symulację</button>
@@ -110,7 +152,8 @@
         alert("⚠️ UWAGA: Poniższa wizualizacja została przygotowana wyłącznie do celów demonstracyjnych. Kod frontendu nie jest przeznaczony do wdrożenia na środowisku produkcyjnym!");
     };
 
-    let activeIntervalId = null;
+    let activeTimeoutId = null;
+    let isSimulationRunning = false;
 
     function logInfo(msg) {
         const logs = document.getElementById('logs');
@@ -118,7 +161,6 @@
         logs.scrollTop = logs.scrollHeight;
     }
 
-    // Tłumaczenie relacji skrzyżowania na kierunek skrętu
     function getTurnDirection(start, end) {
         const map = {
             'north-south': 'PROSTO', 'north-east': 'LEWO', 'north-west': 'PRAWO',
@@ -158,8 +200,8 @@
         runBtn.disabled = true;
         stopBtn.style.display = 'block';
         document.getElementById('logs').innerHTML = "";
+        isSimulationRunning = true;
 
-        // Resetujemy statystyki na ekranie na starcie
         updateRoadStats({ north: [], south: [], east: [], west: [] });
 
         logInfo("Wysyłanie danych do backendu (/simulate)...");
@@ -178,7 +220,6 @@
             const data = await response.json();
             logInfo("Odpowiedź odebrana! Rozpoczynam animację...");
 
-            // Przekazujemy również commands, żeby śledzić stan kolejek
             playSimulation(data.stepStatuses, payload.commands, runBtn, stopBtn);
 
         } catch (error) {
@@ -192,20 +233,9 @@
         let currentStep = 0;
         let cmdIdx = 0;
 
-        // Lokalny stan kolejek na frontendzie
         let queues = { north: [], south: [], east: [], west: [] };
 
-        activeIntervalId = setInterval(() => {
-            if (currentStep >= steps.length) {
-                clearInterval(activeIntervalId);
-                document.getElementById('stepCounter').innerText = "Symulacja Zakończona!";
-                document.getElementById('center').innerHTML = `<span style="color:#2c3e50; font-size: 12px;">Skrzyżowanie</span>`;
-                logInfo("Koniec symulacji.");
-                resetButtons(runBtn, stopBtn);
-                return;
-            }
-
-            // 1. Przetwarzamy wszystkie komendy addVehicle AŻ DO obecnego 'step'
+        function loadCarsUntilNextStep() {
             while (cmdIdx < commands.length && commands[cmdIdx].type !== 'step') {
                 const cmd = commands[cmdIdx];
                 if (cmd.type === 'addVehicle' && queues[cmd.startRoad]) {
@@ -216,10 +246,22 @@
                 }
                 cmdIdx++;
             }
-            // Zwiększamy o 1, żeby w następnym cyklu ominąć obecną komendę 'step'
-            cmdIdx++;
+        }
 
-            // 2. Usuwamy z kolejek auta, które właśnie zjechały w tym kroku
+        loadCarsUntilNextStep();
+        updateRoadStats(queues);
+
+        function executeStep() {
+            if (!isSimulationRunning) return;
+
+            if (currentStep >= steps.length) {
+                document.getElementById('stepCounter').innerText = "Symulacja Zakończona!";
+                document.getElementById('center').innerHTML = `<span style="color:#2c3e50; font-size: 12px;">Skrzyżowanie</span>`;
+                logInfo("Koniec symulacji.");
+                resetButtons(runBtn, stopBtn);
+                return;
+            }
+
             const stepData = steps[currentStep];
             const leftCars = stepData.leftVehicles || [];
 
@@ -229,28 +271,43 @@
                 }
             });
 
-            // 3. Aktualizujemy widok kolejek
             updateRoadStats(queues);
 
-            // 4. Wizualizacja centralna i logi
             document.getElementById('stepCounter').innerText = `Krok: ${currentStep + 1} / ${steps.length}`;
             if(leftCars.length > 0) {
                 logInfo(`[Krok ${currentStep + 1}] Zjazd: ${leftCars.join(", ")}`);
                 const carBadges = leftCars.map(car => `<span class="car-badge">${car}</span>`).join("");
                 document.getElementById('center').innerHTML = carBadges;
             } else {
-                logInfo(`[Krok ${currentStep + 1}] Skrzyżowanie puste / Oczekiwanie`);
+                logInfo(`[Krok ${currentStep + 1}] Skrzyżowanie puste / Zmiana świateł`);
                 document.getElementById('center').innerHTML = "";
             }
 
+            if (cmdIdx < commands.length && commands[cmdIdx].type === 'step') {
+                cmdIdx++;
+            }
+
+            loadCarsUntilNextStep();
+            updateRoadStats(queues);
+
             currentStep++;
-        }, 1200); // Nieco wydłużony czas (1.2s), żeby łatwiej było czytać napisy
+
+            const currentDelay = parseInt(document.getElementById('speedSelect').value, 10);
+
+            activeTimeoutId = setTimeout(executeStep, currentDelay);
+        }
+
+        const initialDelay = parseInt(document.getElementById('speedSelect').value, 10);
+        activeTimeoutId = setTimeout(executeStep, initialDelay);
     }
 
     function stopSimulation() {
-        if (activeIntervalId !== null) {
-            clearInterval(activeIntervalId);
-            activeIntervalId = null;
+        if (isSimulationRunning) {
+            isSimulationRunning = false;
+            if (activeTimeoutId !== null) {
+                clearTimeout(activeTimeoutId);
+                activeTimeoutId = null;
+            }
 
             document.getElementById('stepCounter').innerText = "Symulacja Przerwana!";
             document.getElementById('center').innerHTML = `<span style="color:#2c3e50; font-size: 12px;">Skrzyżowanie</span>`;
@@ -265,6 +322,7 @@
     function resetButtons(runBtn, stopBtn) {
         runBtn.disabled = false;
         stopBtn.style.display = 'none';
+        isSimulationRunning = false;
     }
 </script>
 </body>

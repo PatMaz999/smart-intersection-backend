@@ -43,8 +43,6 @@
 
 ### Testy
 
----
-
 * **Kluczowa logika:** Kluczowa logika aplikacji odpowiadająca za ustalanie pierwszeństwa przejazdu oraz sterowanie ruchem zawiera pokrycie testami wynoszące `ponad 90%` linii kodu.
 * **Zapobieganie kolizjom:** testy pokrywają `wszystkie` możliwe przypadki dotyczące przejazdów na skrzyżowaniu wykluczając możliwość wystapienia kolizji
 

@@ -17,11 +17,11 @@
 ### Uruchomienie
 
 * **Linux / macOS / Windows (PowerShell):** ./gradlew bootRun
-* **Windows (Klasyczny Wiersz Poleceń / CMD):** gradlew.bat bootRun
+* **Windows (CMD):** .\gradlew.bat bootRun
 
 ### Dostęp po uruchomieniu
 
-* Na potrzeby prezentacji systemu udostępniona została wizualizacja działania, pozwalająca przetestować system (również na niestandardowych przypadkach): [Wersja demonstracyjna](http://localhost:8080)
+* Na potrzeby prezentacji systemu udostępniona została wizualizacja działania, pozwalająca przetestować system (również na niestandardowych przypadkach). W folderze exampleData udostępnione zostały przykładowe przypadki symulacji: [Wersja demonstracyjna](http://localhost:8080)
 * W standardowych warunkach komunikacja z systemem odbywa się przez REST API: [Dokumentacja API](#dokumentacja-api)
 
 ---

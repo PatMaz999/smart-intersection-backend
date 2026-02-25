@@ -1,7 +1,7 @@
 package org.smartintersection.domain.model.vehicle;
 
 import org.smartintersection.domain.model.intersection.Direction;
-import org.smartintersection.exception.IllegalTurnException;
+import org.smartintersection.domain.exception.IllegalTurnException;
 
 public enum TurnDirection {
     LEFT, STRAIGHT, RIGHT;

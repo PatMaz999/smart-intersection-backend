@@ -1,5 +1,6 @@
 package org.smartintersection.infrastructure.controller;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.smartintersection.infrastructure.adapter.JsonSimulationAdapter;
 import org.smartintersection.infrastructure.dto.input.SimulationInputDto;
@@ -16,7 +17,7 @@ public class JsonController {
     private final JsonSimulationAdapter jsonSimulationAdapter;
 
     @PostMapping("/simulate")
-    public ResponseEntity<SimulationOutput> simulate(@RequestBody SimulationInputDto inputDto) {
+    public ResponseEntity<@NonNull SimulationOutput> simulate(@RequestBody SimulationInputDto inputDto) {
         return ResponseEntity.ok(jsonSimulationAdapter.runSimpleSimulation(inputDto));
     }
 }

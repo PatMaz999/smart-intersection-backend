@@ -1,4 +1,4 @@
-package org.smartintersection.exception;
+package org.smartintersection.domain.exception;
 
 import org.smartintersection.domain.model.intersection.Direction;
 

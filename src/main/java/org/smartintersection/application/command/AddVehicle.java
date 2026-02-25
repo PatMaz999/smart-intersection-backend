@@ -9,7 +9,7 @@ import org.smartintersection.domain.model.vehicle.VehicleId;
 import java.util.Optional;
 
 @Builder
-public class addVehicle implements Command {
+public class AddVehicle implements Command {
 
     VehicleId vehicleId;
     Direction startRoad;

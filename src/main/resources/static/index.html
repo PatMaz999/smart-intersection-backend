@@ -147,7 +147,7 @@
 
 <script>
     window.onload = function() {
-        alert("⚠️ UWAGA: Poniższa wizualizacja została przygotowana wyłącznie do celów demonstracyjnych. Kod frontendu nie został wykonany sposób spełniający wymagania współczesnych systemów oraz nie nadaje się do wdrożenia!");
+        alert("⚠️ UWAGA: Poniższa wizualizacja została przygotowana wyłącznie w celu demonstracji systemu backendowego. Kod frontendu nie został wykonany w sposób spełniający wymagania współczesnych systemów oraz nie nadaje się do wdrożenia!");
     };
 
     let activeTimeoutId = null;
@@ -211,8 +211,19 @@
                 body: JSON.stringify(payload)
             });
 
+            // NOWA OBSŁUGA BŁĘDÓW (400, 422, itd.)
             if (!response.ok) {
-                throw new Error("Błąd HTTP: " + response.status);
+                const errorData = await response.json();
+                const errorMsg = errorData.message || "Wystąpił nieoczekiwany błąd";
+
+                logInfo(`<span style="color: #e74c3c; font-weight: bold;">BŁĄD ${response.status}: ${errorMsg}</span>`);
+
+                if (response.status === 422) {
+                    logInfo("<span style='color: #f1c40f;'>[Reguła biznesowa] Ruch niedozwolony na tym skrzyżowaniu.</span>");
+                }
+
+                resetButtons(runBtn, stopBtn);
+                return;
             }
 
             const data = await response.json();
@@ -221,7 +232,8 @@
             playSimulation(data.stepStatuses, payload.commands, runBtn, stopBtn);
 
         } catch (error) {
-            logInfo("Błąd połączenia z backendem! Upewnij się, że serwer działa.");
+            // Błąd sieciowy (serwer wyłączony)
+            logInfo("<span style='color: #e74c3c;'>Błąd krytyczny: Brak połączenia z serwerem!</span>");
             console.error(error);
             resetButtons(runBtn, stopBtn);
         }
@@ -277,7 +289,7 @@
                 const carBadges = leftCars.map(car => `<span class="car-badge">${car}</span>`).join("");
                 document.getElementById('center').innerHTML = carBadges;
             } else {
-                logInfo(`[Krok ${currentStep + 1}] Skrzyżowanie puste / Zmiana świateł`);
+                logInfo(`[Krok ${currentStep + 1}] Skrzyżowanie puste / Brak ruchu`);
                 document.getElementById('center').innerHTML = "";
             }
 

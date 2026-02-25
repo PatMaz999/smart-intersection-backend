@@ -3,6 +3,18 @@
 
 ---
 
+### Uruchomienie
+
+* **Linux / macOS / Windows (PowerShell):** ./gradlew bootRun
+* **Windows (Klasyczny Wiersz Poleceń / CMD):** gradlew.bat bootRun
+
+### Dostęp po uruchomieniu
+
+* Na potrzeby prezentacji systemu udostępniona została wizualizacja działania dostępna pozwalająca przetestować system (również na niestandardowych przypadkach): http://localhost:8080 
+* W standardowych warunkach komunikacja z systemem odbywa się przez REST API: [Dokumentacja API](#dokumentacja-api)
+
+---
+
 ### Algorytm sterujący ruchem
 
 #### Główne cechy
@@ -30,6 +42,63 @@
 
 ---
 
+### Dokumentacja API
+
+#### Endpoint symulacji
+
+**Run simulation**
+
+* **URL:** `/simulate`
+* **Method:** `POST`
+* **Body:**
+```json
+{
+  "commands": [
+    {
+      "type": "addVehicle",
+      "vehicleId": "V1",
+      "startRoad": "south",
+      "endRoad": "north"
+    },
+    {
+      "type": "step"
+    }
+  ]
+}
+```
+
+* **Success Response:**
+    * **Code:** 200
+    * **Content:**
+```json
+{
+  "stepStatuses": [
+    {
+      "leftVehicles": [
+        "V1"
+      ]
+    },
+    {
+      "leftVehicles": []
+    }
+  ]
+}
+```
+
+* **Error Response:**
+    * **Code:** 400
+    * **Content:** { "error": "Bad Request" }
+
+---
+
+### Testy
+
+* **Kluczowa logika:** Kluczowa logika aplikacji odpowiadająca za ustalanie pierwszeństwa przejazdu oraz sterowanie ruchem zawiera pokrycie testami wynoszące `ponad 90%` linii kodu.
+* **Zapobieganie kolizjom:** testy pokrywają `wszystkie` możliwe przypadki dotyczące przejazdów na skrzyżowaniu wykluczając możliwość wystapienia kolizji
+
+
+---
+
 ### Stack technologiczny
 
 * **Język programowania:** `Java 25`
@@ -41,14 +110,7 @@
 
 ---
 
-### Testy
-
-* **Kluczowa logika:** Kluczowa logika aplikacji odpowiadająca za ustalanie pierwszeństwa przejazdu oraz sterowanie ruchem zawiera pokrycie testami wynoszące `ponad 90%` linii kodu.
-* **Zapobieganie kolizjom:** testy pokrywają `wszystkie` możliwe przypadki dotyczące przejazdów na skrzyżowaniu wykluczając możliwość wystapienia kolizji
-
----
-
-### Architektua systemu
+### Architektura systemu
 
 Priorytetem podczas tworzenia systemu było zapewnienie **maksymalnej rozszarzalności** w celu umożliwienia bardzo łatwego implementowania nowych funkcjonalności
 

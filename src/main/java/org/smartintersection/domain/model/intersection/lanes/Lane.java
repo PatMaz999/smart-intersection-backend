@@ -7,7 +7,6 @@ import org.smartintersection.domain.model.vehicle.Vehicle;
 import java.util.Collection;
 import java.util.Optional;
 
-//TODO: refactor
 public interface Lane {
     void addVehicle(Vehicle vehicle);
     Vehicle passNextVehicle();

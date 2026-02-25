@@ -47,8 +47,11 @@
 #### Zasady symulacji
 
 * **Czas podzielony na cykle:** Symulacja opiera się na dyskretnych krokach (cyklach). Kolejny stan skrzyżowania obliczany jest tylko po wywołaniu zdarzenia kroku (np. komendy `step`).
+
 * **Całkowita zmiana świateł zajmuje jeden cykl.**
+
 * **Samochody nie przejeżdżają podczas fazy żółtego światła:** Pozwala to zachować pełną deterministyczność symulacji. Można to łatwo zmienić, modyfikując metodę `canMove` w klasach `ClearancePhase`, `ClearSingleLane`.
+
 * **Przepustowość cyklu:** Podczas trwania jednego cyklu, z każdego pasa, skrzyżowanie może opuścić maksymalnie jeden pojazd. (Dla obecnie zaimplementowanego skrzyżowania jednojezdniowego).
 
 ---
@@ -98,7 +101,11 @@
 
 * **Error Response:**
     * **Code:** 400
-    * **Content:** `{ "error": "Bad Request" }`
+      * **Content:** `{ "message": "invalid argument" }`
+
+    * **Code:** 422 
+      * **Cause** Returned when data is correct, but intersection configuration does not support specific operation
+      * **Content:** `{ "message": "Unsupported turn direction SOUTH to SOUTH" }`
 
 ---
 
@@ -141,8 +148,13 @@ Priorytetem podczas tworzenia systemu było zapewnienie **maksymalnej rozszerzal
 ### Możliwości rozwoju
 
 * **Różne priorytety pojazdów:** System umożliwia dodanie pojazdów z wyższym lub niższym priorytetem przejazdu. Nowy typ musi implementować interfejs `Vehicle`. Nowy typ może posiadać inny priorytet zwracany metodą `getPriority()` oraz posiadać inną logikę zwiększania priorytetu podczas oczekiwania `incrementPriority()`.
+
 * **Różne konfiguracje pasów dojazdowych:** Nowa konfiguracja powinna implementować interfejs `LanesGroup`. Wystarczy zmienić sposób tworzenia nowych klas implementujących interfejs `Lane`. Można w ten sposób utworzyć konfiguracje skrzyżowania z trzema drogami dojazdowymi.
+
 * **Różne priorytety pasów dojazdowych:** Nowa konfiguracja powinna implementować interfejs `Lane`. W nowej implementacji wystarczy zmienić metodę `getPriority()`. Można to zrobić na przykład uwzględniając przy zwracanej wartości wagę.
+
 * **Nowe konfiguracje stanów świateł:** Nowy stan powinien implementować interfejs `LightState` (polecam wykorzystanie abstrakcyjnej klasy `AbstractLightState`). Klasa abstrakcyjna musi posiadać metodę `canMove` określającą pierwszeństwo przejazdu nowego stanu. Nowe stany będą przydatne przy implementacji skrzyżowań z wielojezdniowymi dojazdami.
+
 * **Nowe strategie zmiany świateł:** Można utworzyć całkowicie nowe zasady zmiany świateł implementując `TrafficStrategy` (na przykład standardowe nieinteligentne) lub dostosować istniejącą `StandardStrategy`, która jest łańcuchem zależności zawierającym klasy rozszerzające klasę `AbstractTrafficHandler`. Handlery jeden po drugim podejmują decyzję o zmianie stanu świateł lub delegują podjęcie decyzji do kolejnego. Jeżeli żaden nie podejmie decyzji, to przedłużany jest obecny stan świateł. Można dowolnie dodawać nowe, usuwać lub zmienić kolejność handlerów.
+
 * **Wielopasowe drogi dojazdowe:** Możliwe jest utworzenie nowej implementacji `LanesGroup` dla dojazdów wielojezdniowych. Standardowe stany świateł oraz standardowe strategie powinny być kompatybilne z wielopasowymi skrzyżowaniami, jednak nie będą efektywne. W związku z tym polecam utworzenie dla nich nowych stanów świateł drogowych oraz utworzenie nowej strategii opartej o istniejące handlery.
